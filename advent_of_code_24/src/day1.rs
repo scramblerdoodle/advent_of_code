@@ -17,6 +17,7 @@ fn match_list(filepath: &str) -> i32 {
     list_one.sort();
     list_two.sort();
 
+    // For each element in list one and two, sum absolute differences
     (0..list_one.len())
         .map(|i| (list_one[i] - list_two[i]).abs())
         .sum()
@@ -25,12 +26,11 @@ fn match_list(filepath: &str) -> i32 {
 fn match_list_v2(filepath: &str) -> i32 {
     let (list_one, list_two) = parse_input(filepath);
 
-    // Convert lists into sets
+    // For each element in list one, add to list two counter map
     let mut map_two: HashMap<i32, i32> = HashMap::new();
-    for n in list_two {
-        let count = map_two.entry(n).or_default();
-        *count += 1;
-    }
+    list_two
+        .iter()
+        .for_each(|k| *map_two.entry(*k).or_default() += 1);
 
     // Return sum number * count
     list_one
