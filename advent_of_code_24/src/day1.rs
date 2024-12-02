@@ -17,13 +17,9 @@ fn match_list(filepath: &str) -> i32 {
     list_one.sort();
     list_two.sort();
 
-    let mut result: i32 = 0;
-
-    for i in 0..list_one.len() {
-        result += (list_one[i] - list_two[i]).abs();
-    }
-
-    result
+    (0..list_one.len())
+        .map(|i| (list_one[i] - list_two[i]).abs())
+        .sum()
 }
 
 fn match_list_v2(filepath: &str) -> i32 {
