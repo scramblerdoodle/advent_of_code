@@ -3,48 +3,55 @@ use std::{collections::HashMap, fs::read_to_string};
 fn parse_input(filepath: &str) -> (Vec<i32>, Vec<i32>) {
     let mut list_one: Vec<i32> = vec![];
     let mut list_two: Vec<i32> = vec![];
-
-    for line in read_to_string(filepath).unwrap().lines() {
-        let mut nums = line.split("   ").map(|c| c.parse::<i32>().unwrap());
+    read_to_string(filepath).unwrap().lines().for_each(|l| {
+        let mut nums = l.split("   ").map(|c| c.parse::<i32>().unwrap());
         list_one.push(nums.next().unwrap());
         list_two.push(nums.next().unwrap());
-    }
+    });
+
     (list_one, list_two)
 }
 
-fn match_list(filepath: &str) -> i32 {
-    let (mut list_one, mut list_two) = parse_input(filepath);
-    list_one.sort();
-    list_two.sort();
+fn match_list(mut l1: Vec<i32>, mut l2: Vec<i32>) -> i32 {
+    l1.sort();
+    l2.sort();
 
     // For each element in list one and two, sum absolute differences
-    (0..list_one.len())
-        .map(|i| (list_one[i] - list_two[i]).abs())
-        .sum()
+    (0..l1.len()).map(|i| (l1[i] - l2[i]).abs()).sum()
 }
 
-fn match_list_v2(filepath: &str) -> i32 {
-    let (list_one, list_two) = parse_input(filepath);
+fn match_list_v2(l1: Vec<i32>, l2: Vec<i32>) -> i32 {
+    let mut l2_counter: HashMap<i32, i32> = HashMap::new();
 
     // For each element in list one, add to list two counter map
-    let mut map_two: HashMap<i32, i32> = HashMap::new();
-    list_two
-        .iter()
-        .for_each(|k| *map_two.entry(*k).or_default() += 1);
+    l2.iter()
+        .for_each(|k| *l2_counter.entry(*k).or_default() += 1);
 
     // Return sum number * count
-    list_one
-        .iter()
-        .map(|n| *n * *map_two.entry(*n).or_default())
+    l1.iter()
+        .map(|n| *n * *l2_counter.entry(*n).or_default())
         .sum()
 }
 
 pub fn main(s: &str) -> i32 {
     match s {
-        "example" => match_list("./tests/day1/example.txt"),
-        "actual" => match_list("./tests/day1/actual.txt"),
-        "actual_v2" => match_list_v2("./tests/day1/actual.txt"),
-        "example_v2" => match_list_v2("./tests/day1/example.txt"),
+        "example" => {
+            let (l1, l2) = parse_input("./tests/day1/example.txt");
+            match_list(l1, l2)
+        }
+        "actual" => {
+            let (l1, l2) = parse_input("./tests/day1/actual.txt");
+            match_list(l1, l2)
+        }
+
+        "example_v2" => {
+            let (l1, l2) = parse_input("./tests/day1/example.txt");
+            match_list_v2(l1, l2)
+        }
+        "actual_v2" => {
+            let (l1, l2) = parse_input("./tests/day1/actual.txt");
+            match_list_v2(l1, l2)
+        }
         _ => todo!(),
     }
 }
