@@ -37,6 +37,65 @@ fn day5(orders: Orders) -> u32 {
     result
 }
 
+fn day5_v2(orders: Orders) -> u32 {
+    let mut result: u32 = 0;
+    let mut incorrect_processes: Vec<Vec<String>> = vec![];
+
+    for prod_line in &orders.production {
+        let mut seen: HashSet<String> = HashSet::new();
+        let mut unseen: HashSet<String> = HashSet::from_iter(prod_line.clone());
+
+        let mut valid = true;
+        for p in prod_line {
+            for (p1, p2) in &orders.rules {
+                // Check rules
+                if p == p2 {
+                    if unseen.contains(p1) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+            seen.insert(p.clone());
+            unseen.remove(p);
+        }
+        if !valid {
+            incorrect_processes.push(prod_line.clone());
+        }
+    }
+
+    println!("{:?}", incorrect_processes);
+
+    for prod_line in incorrect_processes {
+        let mut seen: HashSet<String> = HashSet::new();
+        let mut unseen: HashSet<String> = HashSet::from_iter(prod_line.clone());
+        let order_line: HashSet<String> = unseen.clone();
+        println!("{:?}", prod_line);
+        println!("{:?}", order_line);
+
+        let filtered_orders = orders
+            .rules
+            .iter()
+            .filter(|(p1, p2)| order_line.contains(p1) && order_line.contains(p2));
+
+        // println!("{:?}", filtered_orders);
+        for p in prod_line {
+            for (p1, p2) in filtered_orders.clone() {
+                // Check rules
+                if p == *p2 {
+                    if unseen.contains(p1) {
+                        break;
+                    }
+                }
+            }
+            seen.insert(p.clone());
+            unseen.remove(&p);
+        }
+    }
+
+    result
+}
+
 fn parse_text(file_path: &str) -> Orders {
     let content = read_to_string(file_path).unwrap();
     let mut lines = content.lines();
@@ -70,6 +129,8 @@ pub fn main(s: &str) -> u32 {
     match s {
         "example" => day5(parse_text("./tests/day5/example.txt")),
         "actual" => day5(parse_text("./tests/day5/actual.txt")),
+        "example_v2" => day5_v2(parse_text("./tests/day5/example.txt")),
+        "actual_v2" => day5_v2(parse_text("./tests/day5/actual.txt")),
         _ => todo!(),
     }
 }
@@ -81,5 +142,9 @@ mod tests {
     #[test]
     fn test_example() {
         assert_eq!(main("example"), 143);
+    }
+    #[test]
+    fn test_example_v2() {
+        assert_eq!(main("example_v2"), 123);
     }
 }
