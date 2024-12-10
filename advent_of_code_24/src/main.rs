@@ -4,7 +4,7 @@ pub mod day3;
 pub mod day3_attempt2;
 pub mod day4;
 pub mod day5;
-// pub mod day6;
+pub mod day6;
 // pub mod day7;
 
 use std::io::stdin;
@@ -56,6 +56,12 @@ fn main() {
                 println!("Example v2: {}", day5::main("example_v2"));
                 println!("Actual: {}", day5::main("actual"));
                 println!("Actual v2: {}", day5::main("actual_v2"));
+            }
+            6 => {
+                println!("Example: {}", day6::main("example"));
+                println!("Example v2: {}", day6::main("example_v2"));
+                println!("Actual: {}", day6::main("actual"));
+                println!("Actual v2: {}", day6::main("actual_v2"));
             }
             _ => todo!(),
         }
