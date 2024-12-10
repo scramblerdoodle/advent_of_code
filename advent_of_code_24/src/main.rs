@@ -13,7 +13,7 @@ fn main() {
         let mut input = String::new();
         println!(
             "Choose a Day from {} to {}; 0 exits and default is 0.",
-            1, 5
+            1, 6
         );
         let input = match stdin().read_line(&mut input) {
             Ok(_) => input,
