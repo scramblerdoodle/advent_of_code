@@ -9,7 +9,6 @@ enum Direction {
 
 struct GuardBoard {
     board: Vec<Vec<char>>,
-    visited_board: Vec<Vec<bool>>,
     guard_dir: Direction,
     pos: (usize, usize),
     count: u32,
@@ -46,8 +45,6 @@ impl Direction {
 
 impl GuardBoard {
     fn new(board: Vec<Vec<char>>, starting_pos: (usize, usize)) -> Self {
-        let mut visited_board = vec![vec![false; board.len()]; board[0].len()];
-        visited_board[starting_pos.0][starting_pos.1] = true;
         let guard_dir = match board[starting_pos.0][starting_pos.1] {
             '^' => Direction::UP,
             '>' => Direction::RIGHT,
@@ -60,7 +57,6 @@ impl GuardBoard {
         };
         GuardBoard {
             board,
-            visited_board,
             guard_dir,
             pos: starting_pos,
             count: 0,
