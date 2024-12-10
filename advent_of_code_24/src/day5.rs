@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fs::read_to_string};
+use std::{cmp::Ordering, collections::HashSet, fs::read_to_string};
 
 #[derive(Debug)]
 struct Orders {
@@ -37,6 +37,18 @@ fn day5(orders: Orders) -> u32 {
     result
 }
 
+fn sort_rules(a: &String, b: &String, rules: &Vec<&(String, String)>) -> Ordering {
+    for (p1, p2) in rules {
+        if a == p1 && b == p2 {
+            return Ordering::Less;
+        }
+        if b == p1 && a == p2 {
+            return Ordering::Greater;
+        }
+    }
+    Ordering::Equal
+}
+
 fn day5_v2(orders: Orders) -> u32 {
     let mut result: u32 = 0;
     let mut incorrect_processes: Vec<Vec<String>> = vec![];
@@ -67,30 +79,27 @@ fn day5_v2(orders: Orders) -> u32 {
     println!("{:?}", incorrect_processes);
 
     for prod_line in incorrect_processes {
-        let mut seen: HashSet<String> = HashSet::new();
-        let mut unseen: HashSet<String> = HashSet::from_iter(prod_line.clone());
-        let order_line: HashSet<String> = unseen.clone();
-        println!("{:?}", prod_line);
-        println!("{:?}", order_line);
+        let order_line: HashSet<String> = HashSet::from_iter(prod_line.clone());
+        println!("prod_line        : {:?}", prod_line);
+        println!("order_line       : {:?}", order_line);
 
-        let filtered_orders = orders
+        let filtered_rules: Vec<&(String, String)> = orders
             .rules
             .iter()
-            .filter(|(p1, p2)| order_line.contains(p1) && order_line.contains(p2));
+            .filter(|(p1, p2)| order_line.contains(p1) && order_line.contains(p2))
+            .collect();
 
-        // println!("{:?}", filtered_orders);
-        for p in prod_line {
-            for (p1, p2) in filtered_orders.clone() {
-                // Check rules
-                if p == *p2 {
-                    if unseen.contains(p1) {
-                        break;
-                    }
-                }
-            }
-            seen.insert(p.clone());
-            unseen.remove(&p);
-        }
+        println!("filtered_rules   : {:?}", filtered_rules);
+
+        // Now we have a list of all order rules contained in the production list
+        // We can use this to rebuild the correctly-ordered sequence
+        let mut ordered_prod_line = prod_line.clone();
+        ordered_prod_line.sort_by(|a, b| sort_rules(a, b, &filtered_rules));
+        println!("ordered_prod_line: {:?}", ordered_prod_line);
+        println!();
+
+        let middle_page_index = (ordered_prod_line.len() - 1) / 2;
+        result += ordered_prod_line[middle_page_index].parse::<u32>().unwrap();
     }
 
     result
