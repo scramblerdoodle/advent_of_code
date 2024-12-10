@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
 
+#[derive(Clone)]
 enum Direction {
     UP,
     RIGHT,
@@ -7,15 +8,17 @@ enum Direction {
     LEFT,
 }
 
+#[derive(Clone)]
 struct GuardBoard {
     board: Vec<Vec<char>>,
     guard_dir: Direction,
     pos: (usize, usize),
+    visited_board: Vec<Vec<i8>>,
     count: u32,
 }
 
 impl Direction {
-    fn next(self) -> Self {
+    fn next(&self) -> Self {
         match self {
             Direction::UP => Direction::RIGHT,
             Direction::RIGHT => Direction::DOWN,
@@ -55,10 +58,14 @@ impl GuardBoard {
                 starting_pos.0, starting_pos.1
             ),
         };
+
+        let mut visited_board = vec![vec![0; board[0].len()]; board.len()];
+        visited_board[starting_pos.0][starting_pos.1] = 1;
         GuardBoard {
             board,
             guard_dir,
             pos: starting_pos,
+            visited_board,
             count: 0,
         }
     }
@@ -67,7 +74,7 @@ impl GuardBoard {
         let mut pos = self.pos;
         loop {
             let step = self.guard_dir.get_step();
-            let next_pos = (pos.0 as i8 + step.0, pos.1 as i8 + step.1);
+            let next_pos = (pos.0 as i16 + step.0 as i16, pos.1 as i16 + step.1 as i16);
 
             if next_pos.0 < 0 || next_pos.1 < 0 {
                 self.count += 1;
@@ -106,10 +113,126 @@ impl GuardBoard {
             }
         }
 
-        for l in &self.board {
-            println!("{}", l.iter().collect::<String>());
+        // self.print_board();
+
+        self.count
+    }
+
+    #[allow(dead_code)]
+    fn print_board(&self) -> () {
+        use log_update::LogUpdate;
+        use std::{io::stdout, thread::sleep, time::Duration};
+
+        let mut log_update = LogUpdate::new(stdout()).unwrap();
+
+        let lines = self
+            .board
+            .iter()
+            .map(|l| l.iter().collect::<String>())
+            .collect::<Vec<String>>();
+
+        sleep(Duration::from_millis(1));
+        log_update.render(&format!("{}", lines.join("\n"))).unwrap();
+    }
+
+    fn is_loop(&mut self) -> bool {
+        loop {
+            let step = self.guard_dir.get_step();
+            let next_pos = (
+                self.pos.0 as i16 + step.0 as i16,
+                self.pos.1 as i16 + step.1 as i16,
+            );
+
+            if next_pos.0 < 0 || next_pos.1 < 0 {
+                return false;
+            }
+
+            let next_pos = (next_pos.0 as usize, next_pos.1 as usize);
+
+            // Next position
+            match self.board.get(next_pos.0) {
+                None => {
+                    return false;
+                } // Out of bounds
+                Some(line) => match line.get(next_pos.1) {
+                    None => {
+                        return false;
+                    } // Out of bounds
+                    Some(c) => match c {
+                        '.' => {
+                            self.board[self.pos.0][self.pos.1] = 'X';
+                            self.visited_board[next_pos.0][next_pos.1] += 1;
+                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                            self.pos = next_pos;
+                        }
+                        '#' | 'O' => {
+                            self.guard_dir = self.guard_dir.next();
+                            self.board[self.pos.0][self.pos.1] = self.guard_dir.as_char();
+                        }
+                        'X' => {
+                            self.visited_board[next_pos.0][next_pos.1] += 1;
+                            if self.visited_board[next_pos.0][next_pos.1] == 4 {
+                                return true;
+                            };
+
+                            self.board[self.pos.0][self.pos.1] = 'X';
+                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                            self.pos = next_pos;
+                        }
+                        other => panic!("Unexpected char {other}"),
+                    },
+                },
+            }
         }
-        println!();
+    }
+
+    fn place_obstacles(mut self) -> u32 {
+        loop {
+            let step = self.guard_dir.get_step();
+            let next_pos = (self.pos.0 as i8 + step.0, self.pos.1 as i8 + step.1);
+
+            if next_pos.0 < 0 || next_pos.1 < 0 {
+                break;
+            }
+
+            let next_pos = (next_pos.0 as usize, next_pos.1 as usize);
+
+            match self.board.get(next_pos.0) {
+                None => {
+                    break;
+                } // Out of bounds
+                Some(line) => match line.get(next_pos.1) {
+                    None => {
+                        break;
+                    } // Out of bounds
+                    Some(c) => match c {
+                        '.' => {
+                            // What happens if we place an obstacle in next_pos?
+
+                            let mut self_clone = self.clone();
+
+                            self_clone.board[next_pos.0][next_pos.1] = 'O';
+
+                            if self_clone.is_loop() {
+                                self.count += 1;
+                            }
+
+                            self.board[self.pos.0][self.pos.1] = 'X';
+                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                            self.pos = next_pos;
+                        }
+                        '#' => self.guard_dir = self.guard_dir.next(),
+                        'X' => {
+                            // What happens if we place an obstacle in next_pos?
+                            self.board[self.pos.0][self.pos.1] = 'X';
+                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                            self.pos = next_pos;
+                        }
+                        other => panic!("Unexpected char {other}"),
+                    },
+                },
+            }
+        }
 
         self.count
     }
@@ -120,7 +243,7 @@ fn day6(guard_board: GuardBoard) -> u32 {
 }
 
 fn day6_v2(guard_board: GuardBoard) -> u32 {
-    0
+    guard_board.place_obstacles()
 }
 
 fn parse_input(file_path: &str) -> GuardBoard {
@@ -168,11 +291,6 @@ mod tests {
     }
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 0);
-    }
-
-    #[test]
-    fn test_actual() {
-        assert!(main("actual") > 4882);
+        assert_eq!(main("example_v2"), 6);
     }
 }
