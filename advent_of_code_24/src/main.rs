@@ -6,6 +6,8 @@ pub mod day4;
 pub mod day5;
 pub mod day6;
 pub mod day7;
+pub mod day8;
+// pub mod day9;
 
 use std::io::stdin;
 fn main() {
@@ -13,7 +15,7 @@ fn main() {
         let mut input = String::new();
         println!(
             "Choose a Day from {} to {}; 0 exits and default is 0.",
-            1, 7
+            1, 8
         );
         let input = match stdin().read_line(&mut input) {
             Ok(_) => input,
