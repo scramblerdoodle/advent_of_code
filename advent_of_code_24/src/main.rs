@@ -71,6 +71,12 @@ fn main() {
                 println!("Actual: {}", day7::main("actual"));
                 println!("Actual v2: {}", day7::main("actual_v2"));
             }
+            8 => {
+                println!("Example: {}", day8::main("example"));
+                println!("Example v2: {}", day8::main("example_v2"));
+                println!("Actual: {}", day8::main("actual"));
+                println!("Actual v2: {}", day8::main("actual_v2"));
+            }
             _ => todo!(),
         }
         println!();

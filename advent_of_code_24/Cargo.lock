@@ -6,6 +6,7 @@ version = 3
 name = "advent_of_code_24"
 version = "0.1.0"
 dependencies = [
+ "combinatorial",
  "log-update",
  "regex",
  "regex-automata",
@@ -25,6 +26,12 @@ name = "ansi-escapes"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e3c0daaaae24df5995734b689627f8fa02101bc5bbc768be3055b66a010d7af"
+
+[[package]]
+name = "combinatorial"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7bdaf2f71259174671afdb568c8d911635472605f7f4be8b6c08bcc69ea3ed84"
 
 [[package]]
 name = "log-update"
