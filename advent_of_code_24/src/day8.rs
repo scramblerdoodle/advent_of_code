@@ -48,7 +48,8 @@ impl Antinodes {
     fn add_location_if_within(&mut self, pos: (isize, isize)) -> bool {
         if self.is_within_map(pos) {
             self.antinode_locations
-                .insert((pos.0 as usize, pos.1 as usize))
+                .insert((pos.0 as usize, pos.1 as usize));
+            return true;
         } else {
             return false;
         }
@@ -56,6 +57,22 @@ impl Antinodes {
 
     fn count(self) -> u32 {
         self.antinode_locations.len() as u32
+    }
+
+    fn print_map(&self, input: &Input) -> () {
+        let mut map: Vec<Vec<char>> = vec![vec!['.'; self.map_size.1]; self.map_size.0];
+        for (k, v) in input.antenna_map.iter() {
+            for (i, j) in v {
+                map[*i as usize][*j as usize] = *k;
+            }
+        }
+        for (i, j) in self.antinode_locations.iter() {
+            map[*i][*j] = '#';
+        }
+
+        for l in map {
+            println!("{}", l.into_iter().collect::<String>());
+        }
     }
 }
 
@@ -96,11 +113,43 @@ fn day8(inputs: Input) -> Result<u32, ParseIntError> {
 }
 
 fn day8_v2(inputs: Input) -> Result<u32, ParseIntError> {
-    let mut result: u32 = 0;
-    for input in inputs.antenna_map {
-        // result += input.foo.parse::<u32>()?;
-    }
-    Ok(result)
+    let mut antinodes = Antinodes::new(&inputs);
+    inputs.antenna_map.values().for_each(|v| {
+        let combs = Combinations::of_size(v, 2);
+        // Antenna positions for each antenna type
+        // Need a two-by-two combination to calculate the diametrical distances
+        combs.for_each(|v| {
+            let v0 = v.get(0).unwrap();
+            let v1 = v.get(1).unwrap();
+
+            let dist0 = v1.0 - v0.0;
+            let dist1 = v1.1 - v0.1;
+
+            let mut pos1 = (v0.0, v0.1);
+
+            while antinodes.is_within_map(pos1) {
+                antinodes
+                    .antinode_locations
+                    .insert((pos1.0 as usize, pos1.1 as usize));
+                pos1.0 -= dist0;
+                pos1.1 -= dist1;
+            }
+
+            let mut pos2 = (v1.0, v1.1);
+            while antinodes.is_within_map(pos2) {
+                antinodes
+                    .antinode_locations
+                    .insert((pos2.0 as usize, pos2.1 as usize));
+                pos2.0 += dist0;
+                pos2.1 += dist1;
+            }
+        });
+    });
+    println!("{:?}", antinodes);
+    println!("{:?}", inputs);
+
+    antinodes.print_map(&inputs);
+    Ok(antinodes.count())
 }
 
 fn parse_input(filepath: &str) -> Input {
@@ -149,6 +198,6 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 10);
+        assert_eq!(main("example_v2"), 34);
     }
 }
