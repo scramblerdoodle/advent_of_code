@@ -168,10 +168,53 @@ fn day9(input: Input) -> Result<u64, ParseIntError> {
 }
 
 fn day9_v2(input: Input) -> Result<u64, ParseIntError> {
+    let mut blocks: Vec<Block> = input.file_blocks.trim_r().to_vec();
+
+    let mut j = blocks.len() - 1;
+    while j > 0 {
+        while blocks[j].is_free() {
+            j -= 1;
+        }
+
+        for i in 0..j {
+            if blocks[i].is_free() {
+                if blocks[i].size > blocks[j].size {
+                    blocks[i].size -= blocks[j].size;
+                    let block = blocks[j];
+                    blocks[j].state = State::FREE;
+                    blocks[j].id = None;
+                    blocks.insert(i, block);
+                    j += 1;
+                    break;
+                } else if blocks[i].size == blocks[j].size {
+                    let block = blocks[j];
+                    blocks[j] = blocks[i];
+                    blocks[i] = block;
+                    break;
+                }
+            }
+        }
+
+        j -= 1;
+    }
+
+    // println!("{:?}", blocks.to_string());
+
     let mut result: u64 = 0;
-    // for input in inputs {
-    //     result += input.file_blocks.parse::<u64>()?;
-    // }
+    let mut pos: usize = 0;
+    for b in blocks {
+        match b.state {
+            State::FREE => {
+                pos += b.size;
+            }
+            State::FILE => {
+                for _ in 0..b.size {
+                    result += (pos as u64) * (b.id.unwrap() as u64);
+                    pos += 1;
+                }
+            }
+        }
+    }
     Ok(result)
 }
 
@@ -239,6 +282,6 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 0);
+        assert_eq!(main("example_v2"), 2858);
     }
 }
