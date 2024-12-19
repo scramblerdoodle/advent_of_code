@@ -27,11 +27,11 @@ fn compute_tokens_v2(filepath: &str) -> u32 {
                 if state == State::Dont {
                     continue;
                 }
-                println!("{:?}", s);
+                // println!("{:?}", s);
                 let cs = s.to_owned();
-                println!("{:?}", cs);
+                // println!("{:?}", cs);
                 let mut cs = cs.get(4..cs.len() - 1).unwrap().split(",");
-                println!("{:?}", cs);
+                // println!("{:?}", cs);
                 let n1: u32 = cs.next().unwrap().parse().unwrap();
                 let n2: u32 = cs.next().unwrap().parse().unwrap();
 

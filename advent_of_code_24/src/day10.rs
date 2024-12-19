@@ -154,7 +154,7 @@ impl fmt::Display for TrailMap {
 }
 
 fn day10(mut trail: TrailMap) -> u32 {
-    println!("Starting trail: \n{}\n", trail);
+    // println!("Starting trail: \n{}\n", trail);
     for i in 0..trail.trail_map.len() {
         for j in 0..trail.trail_map[i].len() {
             if trail.trail_map[i][j] == 0 {
@@ -164,12 +164,12 @@ fn day10(mut trail: TrailMap) -> u32 {
             }
         }
     }
-    println!("Final trail: \n{}\n", trail);
+    // println!("Final trail: \n{}\n", trail);
     trail.trailhead_count
 }
 
 fn day10_v2(mut trail: TrailMap) -> u32 {
-    println!("Starting trail: \n{}\n", trail);
+    // println!("Starting trail: \n{}\n", trail);
     for i in 0..trail.trail_map.len() {
         for j in 0..trail.trail_map[i].len() {
             if trail.trail_map[i][j] == 0 {
@@ -178,7 +178,7 @@ fn day10_v2(mut trail: TrailMap) -> u32 {
             }
         }
     }
-    println!("Final trail: \n{}\n", trail);
+    // println!("Final trail: \n{}\n", trail);
     trail.trailhead_count
 }
 

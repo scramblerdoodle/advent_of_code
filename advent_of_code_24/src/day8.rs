@@ -59,6 +59,7 @@ impl Antinodes {
         self.antinode_locations.len() as u32
     }
 
+    #[allow(dead_code)]
     fn print_map(&self, input: &Input) -> () {
         let mut map: Vec<Vec<char>> = vec![vec!['.'; self.map_size.1]; self.map_size.0];
         for (k, v) in input.antenna_map.iter() {
@@ -145,10 +146,10 @@ fn day8_v2(inputs: Input) -> Result<u32, ParseIntError> {
             }
         });
     });
-    println!("{:?}", antinodes);
-    println!("{:?}", inputs);
+    // println!("{:?}", antinodes);
+    // println!("{:?}", inputs);
 
-    antinodes.print_map(&inputs);
+    // antinodes.print_map(&inputs);
     Ok(antinodes.count())
 }
 
