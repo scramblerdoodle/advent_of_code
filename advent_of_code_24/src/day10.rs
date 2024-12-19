@@ -1,37 +1,17 @@
+use crate::utils::{Board, Direction};
 use std::{fmt, fs::read_to_string};
 
-#[derive(Debug)]
-enum Direction {
-    Up,
-    Right,
-    Down,
-    Left,
-}
-
-impl Direction {
-    const DIRECTIONS: [Self; 4] = [Self::Up, Self::Right, Self::Down, Self::Left];
-
-    fn get_direction(&self) -> (isize, isize) {
-        match self {
-            Self::Up => (-1, 0),
-            Self::Right => (0, 1),
-            Self::Down => (1, 0),
-            Self::Left => (0, -1),
-        }
-    }
-}
-
 struct TrailMap {
-    trail_map: Vec<Vec<u8>>,
-    visited: Vec<Vec<bool>>,
+    trail_map: Board<u8>,
+    visited: Board<bool>,
     trailhead_count: u32,
 }
 
 impl TrailMap {
     fn new(trail_map: Vec<Vec<u8>>) -> Self {
         TrailMap {
-            visited: vec![vec![false; trail_map[0].len()]; trail_map.len()],
-            trail_map,
+            visited: Board::new(vec![vec![false; trail_map[0].len()]; trail_map.len()]),
+            trail_map: Board::new(trail_map),
             trailhead_count: 0,
         }
     }
@@ -42,32 +22,6 @@ impl TrailMap {
                 self.visited[i][j] = false;
             }
         }
-    }
-
-    fn add_direction(&self, dir: &Direction, pos: (usize, usize)) -> Option<(usize, usize)> {
-        let step = dir.get_direction();
-        let (next_i, next_j): (usize, usize);
-
-        // Guards against negative out of bounds
-        match pos.0.checked_add_signed(step.0) {
-            Some(n) => next_i = n,
-            None => return None,
-        }
-
-        // Guards against negative out of bounds
-        match pos.1.checked_add_signed(step.1) {
-            Some(n) => next_j = n,
-            None => return None,
-        }
-
-        // Guards against positive out of bounds
-        if let Some(next_line) = self.trail_map.get(next_i) {
-            // Guards against positive out of bounds
-            if let Some(_) = next_line.get(next_j) {
-                return Some((next_i, next_j));
-            }
-        };
-        None
     }
 
     fn is_valid_path(&self, curr_level: u8, next_pos: (usize, usize)) -> bool {
@@ -83,8 +37,8 @@ impl TrailMap {
             return;
         }
 
-        for dir in Direction::DIRECTIONS {
-            if let Some(next_step) = self.add_direction(&dir, pos) {
+        for dir in Direction::ORTHOGONALS {
+            if let Some(next_step) = self.trail_map.add_direction(&dir, pos) {
                 let curr_level = self
                     .trail_map
                     .get(pos.0)
@@ -108,8 +62,8 @@ impl TrailMap {
             return;
         }
 
-        for dir in Direction::DIRECTIONS {
-            if let Some(next_step) = self.add_direction(&dir, pos) {
+        for dir in Direction::ORTHOGONALS {
+            if let Some(next_step) = self.trail_map.add_direction(&dir, pos) {
                 let curr_level = self
                     .trail_map
                     .get(pos.0)
@@ -129,26 +83,7 @@ impl fmt::Display for TrailMap {
         writeln!(
             f,
             concat!("Count: {}\n\n", "Map:\n\t{}\n\n", "Visited:\n\t{}"),
-            self.trailhead_count,
-            self.trail_map
-                .iter()
-                .map(|v| v
-                    .iter()
-                    .map(|&d| char::from_digit(d as u32, 10).unwrap())
-                    .collect::<String>())
-                .collect::<Vec<String>>()
-                .join("\n\t"),
-            self.visited
-                .iter()
-                .map(|v| v
-                    .iter()
-                    .map(|&boolean| match boolean {
-                        true => "1",
-                        false => "0",
-                    })
-                    .collect::<String>())
-                .collect::<Vec<String>>()
-                .join("\n\t"),
+            self.trailhead_count, self.trail_map, self.visited
         )
     }
 }

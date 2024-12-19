@@ -8,6 +8,7 @@ pub mod day07;
 pub mod day08;
 pub mod day09;
 pub mod day10;
+mod utils;
 
 use std::time::Instant;
 use std::{fmt, io::stdin};
