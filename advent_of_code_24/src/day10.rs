@@ -1,4 +1,4 @@
-use std::{fmt, fs::read_to_string, num::ParseIntError};
+use std::{fmt, fs::read_to_string};
 
 #[derive(Debug)]
 enum Direction {
@@ -48,21 +48,21 @@ impl TrailMap {
         let step = dir.get_direction();
         let (next_i, next_j): (usize, usize);
 
-        // Guards against out of bounds by going negative
+        // Guards against negative out of bounds
         match pos.0.checked_add_signed(step.0) {
             Some(n) => next_i = n,
             None => return None,
         }
 
-        // Guards against out of bounds by going negative
+        // Guards against negative out of bounds
         match pos.1.checked_add_signed(step.1) {
             Some(n) => next_j = n,
             None => return None,
         }
 
-        // Guards against going out of bounds by going positive
+        // Guards against positive out of bounds
         if let Some(next_line) = self.trail_map.get(next_i) {
-            // Guards against going out of bounds by going positive
+            // Guards against positive out of bounds
             if let Some(_) = next_line.get(next_j) {
                 return Some((next_i, next_j));
             }
@@ -71,13 +71,8 @@ impl TrailMap {
     }
 
     fn is_valid_path(&self, curr_level: u8, next_pos: (usize, usize)) -> bool {
-        if self.trail_map[next_pos.0][next_pos.1] == curr_level + 1
+        self.trail_map[next_pos.0][next_pos.1] == curr_level + 1
             && !self.visited[next_pos.0][next_pos.1]
-        {
-            true
-        } else {
-            false
-        }
     }
 
     fn walk_trail(&mut self, pos: (usize, usize)) {
@@ -104,12 +99,9 @@ impl TrailMap {
     }
 
     fn is_valid_path_v2(&self, curr_level: u8, next_pos: (usize, usize)) -> bool {
-        if self.trail_map[next_pos.0][next_pos.1] == curr_level + 1 {
-            true
-        } else {
-            false
-        }
+        self.trail_map[next_pos.0][next_pos.1] == curr_level + 1
     }
+
     fn walk_trail_v2(&mut self, pos: (usize, usize)) {
         if self.trail_map[pos.0][pos.1] == 9 {
             self.trailhead_count += 1;
@@ -161,7 +153,7 @@ impl fmt::Display for TrailMap {
     }
 }
 
-fn day10(mut trail: TrailMap) -> Result<u32, ParseIntError> {
+fn day10(mut trail: TrailMap) -> u32 {
     println!("Starting trail: \n{}\n", trail);
     for i in 0..trail.trail_map.len() {
         for j in 0..trail.trail_map[i].len() {
@@ -173,10 +165,10 @@ fn day10(mut trail: TrailMap) -> Result<u32, ParseIntError> {
         }
     }
     println!("Final trail: \n{}\n", trail);
-    Ok(trail.trailhead_count)
+    trail.trailhead_count
 }
 
-fn day10_v2(mut trail: TrailMap) -> Result<u32, ParseIntError> {
+fn day10_v2(mut trail: TrailMap) -> u32 {
     println!("Starting trail: \n{}\n", trail);
     for i in 0..trail.trail_map.len() {
         for j in 0..trail.trail_map[i].len() {
@@ -187,7 +179,7 @@ fn day10_v2(mut trail: TrailMap) -> Result<u32, ParseIntError> {
         }
     }
     println!("Final trail: \n{}\n", trail);
-    Ok(trail.trailhead_count)
+    trail.trailhead_count
 }
 
 fn parse_input(filepath: &str) -> TrailMap {
@@ -202,18 +194,10 @@ fn parse_input(filepath: &str) -> TrailMap {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => {
-            day10(parse_input("./tests/day10/example.txt")).expect("Function raised exception")
-        }
-        "actual" => {
-            day10(parse_input("./tests/day10/actual.txt")).expect("Function raised exception")
-        }
-        "example_v2" => {
-            day10_v2(parse_input("./tests/day10/example.txt")).expect("Function raised exception")
-        }
-        "actual_v2" => {
-            day10_v2(parse_input("./tests/day10/actual.txt")).expect("Function raised exception")
-        }
+        "example" => day10(parse_input("./tests/day10/example.txt")),
+        "actual" => day10(parse_input("./tests/day10/actual.txt")),
+        "example_v2" => day10_v2(parse_input("./tests/day10/example.txt")),
+        "actual_v2" => day10_v2(parse_input("./tests/day10/actual.txt")),
         _ => todo!(),
     }
 }
