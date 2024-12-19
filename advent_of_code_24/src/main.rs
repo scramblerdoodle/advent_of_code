@@ -1,4 +1,5 @@
 pub mod day1;
+pub mod day10;
 pub mod day2;
 pub mod day3;
 pub mod day3_attempt2;
@@ -82,6 +83,12 @@ fn main() {
                 println!("Example v2: {}", day9::main("example_v2"));
                 println!("Actual: {}", day9::main("actual"));
                 println!("Actual v2: {}", day9::main("actual_v2"));
+            }
+            10 => {
+                println!("Example: {}", day10::main("example"));
+                println!("Example v2: {}", day10::main("example_v2"));
+                println!("Actual: {}", day10::main("actual"));
+                println!("Actual v2: {}", day10::main("actual_v2"));
             }
             _ => todo!(),
         }
