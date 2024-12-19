@@ -50,6 +50,6 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example"), 10);
+        assert_eq!(main("example_v2"), 10);
     }
 }
