@@ -1,35 +1,35 @@
-use std::{fs::read_to_string, num::ParseIntError};
+use std::fs::read_to_string;
 
 struct Input {
-    foo: String,
+    foo: Vec<String>,
 }
 
-fn day0(inputs: Vec<Input>) -> Result<u32, ParseIntError> {
+fn day0(input: Input) -> u32 {
     let mut result: u32 = 0;
-    for input in inputs {
-        result += input.foo.parse::<u32>()?;
+    for line in input.foo {
+        result += line.parse::<u32>().expect("Unexpected input");
     }
-    Ok(result)
-}
-
-fn day0_v2(inputs: Vec<Input>) -> Result<u32, ParseIntError> {
-    let mut result: u32 = 0;
-    for input in inputs {
-        result += input.foo.parse::<u32>()?;
-    }
-    Ok(result)
-}
-
-fn parse_input(filepath: &str) -> Vec<Input> {
-    let mut result: Vec<Input> = vec![];
-    read_to_string(filepath).unwrap().lines().for_each(|l| {
-        result.push(Input { foo: l.to_string() });
-    });
-
     result
 }
 
-pub fn main(s: &str) -> Result<u32, ParseIntError> {
+fn day0_v2(input: Input) -> u32 {
+    let mut result: u32 = 0;
+    for line in input.foo {
+        result += line.parse::<u32>().expect("Unexpected input");
+    }
+    result
+}
+
+fn parse_input(filepath: &str) -> Input {
+    let mut result: Vec<String> = vec![];
+    read_to_string(filepath).unwrap().lines().for_each(|l| {
+        result.push(l.to_string());
+    });
+
+    Input { foo: result }
+}
+
+pub fn main(s: &str) -> u32 {
     match s {
         "example" => day0(parse_input("./tests/day0/example.txt")),
         "actual" => day0(parse_input("./tests/day0/actual.txt")),
@@ -45,11 +45,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example").unwrap(), 10);
+        assert_eq!(main("example"), 10);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example").unwrap(), 10);
+        assert_eq!(main("example"), 10);
     }
 }
