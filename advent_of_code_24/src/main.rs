@@ -2,7 +2,7 @@ pub mod day1;
 pub mod day10;
 pub mod day2;
 pub mod day3;
-pub mod day3_attempt2;
+// pub mod day3_deprecated;
 pub mod day4;
 pub mod day5;
 pub mod day6;
@@ -41,10 +41,10 @@ fn main() {
                 println!("Actual v2: {}", day2::main("actual_v2"));
             }
             3 => {
-                println!("Example: {}", day3_attempt2::main("example"));
-                println!("Example v2: {}", day3_attempt2::main("example_v2"));
-                println!("Actual: {}", day3_attempt2::main("actual"));
-                println!("Actual v2: {}", day3_attempt2::main("actual_v2"));
+                println!("Example: {}", day3::main("example"));
+                println!("Example v2: {}", day3::main("example_v2"));
+                println!("Actual: {}", day3::main("actual"));
+                println!("Actual v2: {}", day3::main("actual_v2"));
             }
             4 => {
                 println!("Example: {}", day4::main("example"));

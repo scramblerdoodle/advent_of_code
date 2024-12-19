@@ -1,233 +1,73 @@
+use regex::Regex;
 use std::fs::read_to_string;
 
-#[derive(Debug, PartialEq)]
-enum Token {
-    LPar,
-    RPar,
-    Mul,
-    Comma,
-    Number(u32),
+#[derive(PartialEq)]
+enum State {
+    Dont,
+    Do,
 }
 
-#[derive(Debug)]
-struct TokenBuffer {
-    tokens: Vec<Token>,
-}
-
-impl TokenBuffer {
-    fn add_if_valid_or_empty(&mut self, t: Token) -> () {
-        let last_t = self.last();
-
-        match last_t {
-            None => {
-                if t == Token::Mul {
-                    self.tokens.push(t);
-                }
-            }
-            Some(Token::Mul) => {
-                if t == Token::LPar {
-                    self.tokens.push(t);
-                } else {
-                    self.tokens.clear();
-                }
-            }
-            Some(Token::LPar) => {
-                if matches!(t, Token::Number { .. }) {
-                    self.tokens.push(t);
-                } else {
-                    self.tokens.clear();
-                }
-            }
-            Some(Token::Number(_n)) => {
-                if t == Token::RPar || matches!(t, Token::Number { .. }) || t == Token::Comma {
-                    self.tokens.push(t);
-                } else {
-                    self.tokens.clear();
-                }
-            }
-            Some(Token::Comma) => {
-                if matches!(t, Token::Number { .. }) {
-                    self.tokens.push(t);
-                } else {
-                    self.tokens.clear();
-                }
-            }
-            Some(Token::RPar) => {
-                self.tokens.push(t);
-                if !self.is_valid() {
-                    self.tokens.clear();
-                }
-            }
-        }
+fn compute_tokens_v2(filepath: &str) -> u32 {
+    let input = &read_to_string(filepath).unwrap()[..];
+    let re = Regex::new(r"(do\(\))|(don't\(\))|(mul\([0-9]+,[0-9]+\))").unwrap();
+    let mut tokens: Vec<&str> = vec![];
+    for (_, [val]) in re.captures_iter(input).map(|c| c.extract()) {
+        tokens.push(val);
     }
 
-    fn is_valid(&self) -> bool {
-        let mut tokens = self.tokens.iter();
-
-        let t = tokens.next();
-        if t.is_none_or(|t| t != &Token::Mul) {
-            return false;
-        }
-
-        let t = tokens.next();
-        if t.is_none_or(|t| t != &Token::LPar) {
-            return false;
-        }
-
-        loop {
-            let t = tokens.next();
-            if t.is_some_and(|t| matches!(t, &Token::Number { .. })) {
-                continue;
-            } else if t.is_some_and(|t| t == &Token::Comma) {
-                break;
-            } else {
-                return false;
-            }
-        }
-
-        loop {
-            let t = tokens.next();
-            if t.is_some_and(|t| matches!(t, &Token::Number { .. })) {
-                continue;
-            } else if t.is_some_and(|t| t == &Token::RPar) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    fn compute(&mut self) -> u32 {
-        println!("{:?}", self.tokens);
-        let mut tokens = self.tokens.iter();
-
-        let mut n1: String = String::new();
-        while let Some(t) = tokens.next() {
-            match t {
-                Token::Number(n) => {
-                    n1.push(char::from_digit(*n, 10).unwrap());
-                }
-                Token::Comma => break,
-                _ => continue,
-            }
-        }
-
-        let mut n2: String = String::new();
-        while let Some(t) = tokens.next() {
-            match t {
-                Token::Number(n) => {
-                    n2.push(char::from_digit(*n, 10).unwrap());
-                }
-                Token::RPar => break,
-                _ => continue,
-            }
-        }
-
-        let n1 = match n1.parse::<u32>() {
-            Ok(n) => n,
-            Err(e) => {
-                println!("n1: {}", n1);
-                panic!("{e}");
-            }
-        };
-        let n2 = match n2.parse::<u32>() {
-            Ok(n) => n,
-            Err(e) => {
-                println!("n1: {}", n1);
-                panic!("{e}");
-            }
-        };
-
-        self.tokens.clear();
-        n1 * n2
-    }
-
-    fn last(&self) -> Option<&Token> {
-        match self.tokens.last() {
-            Some(t) => Some(t),
-            None => None,
-        }
-    }
-}
-
-fn compute_tokens(tokens: Vec<Token>) -> u32 {
-    let mut token_buffer: TokenBuffer = TokenBuffer { tokens: vec![] };
     let mut result: u32 = 0;
 
+    let mut state = State::Do;
     for t in tokens {
-        token_buffer.add_if_valid_or_empty(t);
-        if token_buffer.is_valid() {
-            result += token_buffer.compute();
+        // println!("{:?}", t);
+        match t {
+            "do()" => state = State::Do,
+            "don't()" => state = State::Dont,
+            s => {
+                if state == State::Dont {
+                    continue;
+                }
+                // println!("{:?}", s);
+                let cs = s.to_owned();
+                // println!("{:?}", cs);
+                let mut cs = cs.get(4..cs.len() - 1).unwrap().split(",");
+                // println!("{:?}", cs);
+                let n1: u32 = cs.next().unwrap().parse().unwrap();
+                let n2: u32 = cs.next().unwrap().parse().unwrap();
+
+                result += n1 * n2;
+            }
         }
     }
 
     result
 }
 
-fn parse_input(filepath: &str) -> Vec<Token> {
+fn compute_tokens(filepath: &str) -> u32 {
     let input = &read_to_string(filepath).unwrap()[..];
+    let re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
 
-    let mut tokens: Vec<Token> = vec![];
-    let mut i: usize = 0;
-
-    let cs: Vec<char> = input.chars().collect();
-
-    while i < input.len() {
-        let c = cs.get(i).unwrap();
-
-        match c {
-            '(' => tokens.push(Token::LPar),
-            ')' => tokens.push(Token::RPar),
-            'm' => {
-                let next_c = cs.get(i + 1);
-                let next_next_c = cs.get(i + 2);
-
-                if next_c.is_none() || next_next_c.is_none() {
-                    break;
-                }
-
-                if *next_c.unwrap() != 'u' || *next_next_c.unwrap() != 'l' {
-                    ()
-                }
-
-                i += 2;
-
-                tokens.push(Token::Mul)
-            }
-            '0'..='9' => tokens.push(Token::Number(c.to_digit(10).unwrap())),
-            ',' => tokens.push(Token::Comma),
-            _ => (),
-        };
-
-        i += 1;
+    let mut tokens = vec![];
+    for (_, [n1, n2]) in re.captures_iter(input).map(|c| c.extract()) {
+        tokens.push((
+            n1.to_owned().parse::<u32>().unwrap(),
+            n2.to_owned().parse::<u32>().unwrap(),
+        ));
     }
 
-    // println!("{:?}", tokens);
-
-    tokens
+    let mut result: u32 = 0;
+    for (n1, n2) in tokens {
+        result += n1 * n2;
+    }
+    result
 }
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => {
-            let tokens = parse_input("./tests/day3/example.txt");
-            compute_tokens(tokens)
-        }
-        "actual" => {
-            let tokens = parse_input("./tests/day3/actual.txt");
-            compute_tokens(tokens)
-        }
-
-        "example_v2" => {
-            // let input = parse_input("./tests/day3/example.txt");
-            // lexer_v2(&input[..])
-            0
-        }
-        "actual_v2" => {
-            // let input = parse_input("./tests/day3/actual.txt");
-            // lexer_v2(&input[..])
-            0
-        }
+        "example" => compute_tokens("./tests/day3/example.txt"),
+        "actual" => compute_tokens("./tests/day3/actual.txt"),
+        "example_v2" => compute_tokens_v2("./tests/day3/example.txt"),
+        "actual_v2" => compute_tokens_v2("./tests/day3/actual.txt"),
         _ => todo!(),
     }
 }
@@ -243,11 +83,11 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 0);
+        assert_eq!(main("example_v2"), 8 * 5);
     }
-    //
-    // #[test]
-    // fn test_actual() {
-    //     assert!(main("actual") > 157725712);
-    // }
+
+    #[test]
+    fn test_actual() {
+        assert!(main("actual") > 157725712);
+    }
 }
