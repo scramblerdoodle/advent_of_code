@@ -24,7 +24,7 @@ impl Direction {
 struct TrailMap {
     trail_map: Vec<Vec<u8>>,
     visited: Vec<Vec<bool>>,
-    trailhead_count: usize,
+    trailhead_count: u32,
 }
 
 impl TrailMap {
@@ -102,6 +102,34 @@ impl TrailMap {
             };
         }
     }
+
+    fn is_valid_path_v2(&self, curr_level: u8, next_pos: (usize, usize)) -> bool {
+        if self.trail_map[next_pos.0][next_pos.1] == curr_level + 1 {
+            true
+        } else {
+            false
+        }
+    }
+    fn walk_trail_v2(&mut self, pos: (usize, usize)) {
+        if self.trail_map[pos.0][pos.1] == 9 {
+            self.trailhead_count += 1;
+            return;
+        }
+
+        for dir in Direction::DIRECTIONS {
+            if let Some(next_step) = self.add_direction(&dir, pos) {
+                let curr_level = self
+                    .trail_map
+                    .get(pos.0)
+                    .expect("Out of bounds")
+                    .get(pos.1)
+                    .expect("Out of bounds");
+                if self.is_valid_path_v2(*curr_level, next_step) {
+                    self.walk_trail_v2(next_step);
+                }
+            };
+        }
+    }
 }
 
 impl fmt::Display for TrailMap {
@@ -145,12 +173,21 @@ fn day10(mut trail: TrailMap) -> Result<u32, ParseIntError> {
         }
     }
     println!("Final trail: \n{}\n", trail);
-    Ok(trail.trailhead_count as u32)
+    Ok(trail.trailhead_count)
 }
 
-fn day10_v2(inputs: TrailMap) -> Result<u32, ParseIntError> {
-    // println!("{}", inputs);
-    Ok(0)
+fn day10_v2(mut trail: TrailMap) -> Result<u32, ParseIntError> {
+    println!("Starting trail: \n{}\n", trail);
+    for i in 0..trail.trail_map.len() {
+        for j in 0..trail.trail_map[i].len() {
+            if trail.trail_map[i][j] == 0 {
+                // Find trailhead
+                trail.walk_trail_v2((i, j));
+            }
+        }
+    }
+    println!("Final trail: \n{}\n", trail);
+    Ok(trail.trailhead_count)
 }
 
 fn parse_input(filepath: &str) -> TrailMap {
@@ -190,8 +227,8 @@ mod tests {
         assert_eq!(main("example"), 36);
     }
 
-    // #[test]
-    // fn test_example_v2() {
-    //     assert_eq!(main("example"), 0);
-    // }
+    #[test]
+    fn test_example_v2() {
+        assert_eq!(main("example_v2"), 81);
+    }
 }
