@@ -16,16 +16,14 @@ fn main() {
         let mut input = String::new();
         println!(
             "Choose a Day from {} to {}; 0 exits and default is 0.",
-            1, 9
+            1, 10
         );
         let input = match stdin().read_line(&mut input) {
             Ok(_) => input,
             Err(_) => panic!("Unexpected input."),
         }
-        .chars()
-        .nth(0)
-        .unwrap_or('0')
-        .to_digit(10)
+        .trim()
+        .parse::<u32>()
         .unwrap_or(0);
 
         match input {
