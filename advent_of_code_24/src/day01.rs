@@ -36,20 +36,20 @@ fn match_list_v2(l1: Vec<i32>, l2: Vec<i32>) -> i32 {
 pub fn main(s: &str) -> i32 {
     match s {
         "example" => {
-            let (l1, l2) = parse_input("./tests/day1/example.txt");
+            let (l1, l2) = parse_input("./tests/day01/example.txt");
             match_list(l1, l2)
         }
         "actual" => {
-            let (l1, l2) = parse_input("./tests/day1/actual.txt");
+            let (l1, l2) = parse_input("./tests/day01/actual.txt");
             match_list(l1, l2)
         }
 
         "example_v2" => {
-            let (l1, l2) = parse_input("./tests/day1/example.txt");
+            let (l1, l2) = parse_input("./tests/day01/example.txt");
             match_list_v2(l1, l2)
         }
         "actual_v2" => {
-            let (l1, l2) = parse_input("./tests/day1/actual.txt");
+            let (l1, l2) = parse_input("./tests/day01/actual.txt");
             match_list_v2(l1, l2)
         }
         _ => todo!(),

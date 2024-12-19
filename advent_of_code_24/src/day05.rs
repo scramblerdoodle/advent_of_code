@@ -137,10 +137,10 @@ fn parse_text(file_path: &str) -> Orders {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => day5(parse_text("./tests/day5/example.txt")),
-        "actual" => day5(parse_text("./tests/day5/actual.txt")),
-        "example_v2" => day5_v2(parse_text("./tests/day5/example.txt")),
-        "actual_v2" => day5_v2(parse_text("./tests/day5/actual.txt")),
+        "example" => day5(parse_text("./tests/day05/example.txt")),
+        "actual" => day5(parse_text("./tests/day05/actual.txt")),
+        "example_v2" => day5_v2(parse_text("./tests/day05/example.txt")),
+        "actual_v2" => day5_v2(parse_text("./tests/day05/actual.txt")),
         _ => todo!(),
     }
 }

@@ -273,10 +273,10 @@ fn parse_input(file_path: &str) -> GuardBoard {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => day6(parse_input("./tests/day6/example.txt")),
-        "actual" => day6(parse_input("./tests/day6/actual.txt")),
-        "example_v2" => day6_v2(parse_input("./tests/day6/example.txt")),
-        "actual_v2" => day6_v2(parse_input("./tests/day6/actual.txt")),
+        "example" => day6(parse_input("./tests/day06/example.txt")),
+        "actual" => day6(parse_input("./tests/day06/actual.txt")),
+        "example_v2" => day6_v2(parse_input("./tests/day06/example.txt")),
+        "actual_v2" => day6_v2(parse_input("./tests/day06/actual.txt")),
         _ => todo!(),
     }
 }

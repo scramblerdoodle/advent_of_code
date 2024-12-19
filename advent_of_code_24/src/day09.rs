@@ -252,10 +252,10 @@ fn parse_input(filepath: &str) -> Input {
 
 pub fn main(s: &str) -> u64 {
     let result = match s {
-        "example" => day9(parse_input("./tests/day9/example.txt")),
-        "actual" => day9(parse_input("./tests/day9/actual.txt")),
-        "example_v2" => day9_v2(parse_input("./tests/day9/example.txt")),
-        "actual_v2" => day9_v2(parse_input("./tests/day9/actual.txt")),
+        "example" => day9(parse_input("./tests/day09/example.txt")),
+        "actual" => day9(parse_input("./tests/day09/actual.txt")),
+        "example_v2" => day9_v2(parse_input("./tests/day09/example.txt")),
+        "actual_v2" => day9_v2(parse_input("./tests/day09/actual.txt")),
         _ => todo!(),
     };
     result.unwrap()
@@ -273,7 +273,7 @@ mod tests {
     #[test]
     fn test_input() {
         assert_eq!(
-            parse_input("./tests/day9/example.txt")
+            parse_input("./tests/day09/example.txt")
                 .file_blocks
                 .to_string(),
             "00...111...2...333.44.5555.6666.777.888899".to_string()

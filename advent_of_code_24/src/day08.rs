@@ -180,10 +180,10 @@ fn parse_input(filepath: &str) -> Input {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => day8(parse_input("./tests/day8/example.txt")).unwrap(),
-        "actual" => day8(parse_input("./tests/day8/actual.txt")).unwrap(),
-        "example_v2" => day8_v2(parse_input("./tests/day8/example.txt")).unwrap(),
-        "actual_v2" => day8_v2(parse_input("./tests/day8/actual.txt")).unwrap(),
+        "example" => day8(parse_input("./tests/day08/example.txt")).unwrap(),
+        "actual" => day8(parse_input("./tests/day08/actual.txt")).unwrap(),
+        "example_v2" => day8_v2(parse_input("./tests/day08/example.txt")).unwrap(),
+        "actual_v2" => day8_v2(parse_input("./tests/day08/actual.txt")).unwrap(),
         _ => todo!(),
     }
 }

@@ -210,21 +210,21 @@ fn parse_input(filepath: &str) -> Vec<Token> {
 pub fn main(s: &str) -> u32 {
     match s {
         "example" => {
-            let tokens = parse_input("./tests/day3/example.txt");
+            let tokens = parse_input("./tests/day03/example.txt");
             compute_tokens(tokens)
         }
         "actual" => {
-            let tokens = parse_input("./tests/day3/actual.txt");
+            let tokens = parse_input("./tests/day03/actual.txt");
             compute_tokens(tokens)
         }
 
         "example_v2" => {
-            // let input = parse_input("./tests/day3/example.txt");
+            // let input = parse_input("./tests/day03/example.txt");
             // lexer_v2(&input[..])
             0
         }
         "actual_v2" => {
-            // let input = parse_input("./tests/day3/actual.txt");
+            // let input = parse_input("./tests/day03/actual.txt");
             // lexer_v2(&input[..])
             0
         }

@@ -64,10 +64,10 @@ fn compute_tokens(filepath: &str) -> u32 {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => compute_tokens("./tests/day3/example.txt"),
-        "actual" => compute_tokens("./tests/day3/actual.txt"),
-        "example_v2" => compute_tokens_v2("./tests/day3/example.txt"),
-        "actual_v2" => compute_tokens_v2("./tests/day3/actual.txt"),
+        "example" => compute_tokens("./tests/day03/example.txt"),
+        "actual" => compute_tokens("./tests/day03/actual.txt"),
+        "example_v2" => compute_tokens_v2("./tests/day03/example.txt"),
+        "actual_v2" => compute_tokens_v2("./tests/day03/actual.txt"),
         _ => todo!(),
     }
 }

@@ -31,10 +31,10 @@ fn parse_input(filepath: &str) -> Input {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => day0(parse_input("./tests/day0/example.txt")),
-        "actual" => day0(parse_input("./tests/day0/actual.txt")),
-        "example_v2" => day0_v2(parse_input("./tests/day0/example.txt")),
-        "actual_v2" => day0_v2(parse_input("./tests/day0/actual.txt")),
+        "example" => day0(parse_input("./tests/day00/example.txt")),
+        "actual" => day0(parse_input("./tests/day00/actual.txt")),
+        "example_v2" => day0_v2(parse_input("./tests/day00/example.txt")),
+        "actual_v2" => day0_v2(parse_input("./tests/day00/actual.txt")),
         _ => todo!(),
     }
 }

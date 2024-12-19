@@ -1,13 +1,13 @@
-pub mod day1;
+pub mod day01;
+pub mod day02;
+pub mod day03;
+pub mod day04;
+pub mod day05;
+pub mod day06;
+pub mod day07;
+pub mod day08;
+pub mod day09;
 pub mod day10;
-pub mod day2;
-pub mod day3;
-pub mod day4;
-pub mod day5;
-pub mod day6;
-pub mod day7;
-pub mod day8;
-pub mod day9;
 
 use std::time::Instant;
 use std::{fmt, io::stdin};
@@ -52,18 +52,18 @@ fn main() {
 
         match input {
             0 => break,
-            1 => run_inputs(day1::main),
-            2 => run_inputs(day2::main),
-            3 => run_inputs(day3::main),
-            4 => run_inputs(day4::main),
-            5 => run_inputs(day5::main),
-            6 => run_inputs(day6::main),
+            1 => run_inputs(day01::main),
+            2 => run_inputs(day02::main),
+            3 => run_inputs(day03::main),
+            4 => run_inputs(day04::main),
+            5 => run_inputs(day05::main),
+            6 => run_inputs(day06::main),
             7 => {
                 println!("WARNING! This one takes a while. Not proud of this.");
-                run_inputs(day7::main)
+                run_inputs(day07::main)
             }
-            8 => run_inputs(day8::main),
-            9 => run_inputs(day9::main),
+            8 => run_inputs(day08::main),
+            9 => run_inputs(day09::main),
             10 => run_inputs(day10::main),
             _ => todo!(),
         }

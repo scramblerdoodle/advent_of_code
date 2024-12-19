@@ -248,10 +248,10 @@ fn parse_input_v2(file_path: &str) -> Vec<Equation> {
 
 pub fn main(s: &str) -> u64 {
     match s {
-        "example" => day7(parse_input("./tests/day7/example.txt")),
-        "actual" => day7(parse_input("./tests/day7/actual.txt")),
-        "example_v2" => day7_v2(parse_input_v2("./tests/day7/example.txt")),
-        "actual_v2" => day7_v2(parse_input_v2("./tests/day7/actual.txt")),
+        "example" => day7(parse_input("./tests/day07/example.txt")),
+        "actual" => day7(parse_input("./tests/day07/actual.txt")),
+        "example_v2" => day7_v2(parse_input_v2("./tests/day07/example.txt")),
+        "actual_v2" => day7_v2(parse_input_v2("./tests/day07/actual.txt")),
         _ => todo!(),
     }
 }

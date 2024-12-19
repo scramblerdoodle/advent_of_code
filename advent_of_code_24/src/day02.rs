@@ -138,24 +138,21 @@ fn parse_input(filepath: &str) -> Vec<Vec<i32>> {
 pub fn main(s: &str) -> i32 {
     match s {
         "example" => {
-            let report = parse_input("./tests/day2/example.txt");
+            let report = parse_input("./tests/day02/example.txt");
             reactor_safety(report)
         }
         "actual" => {
-            let report = parse_input("./tests/day2/actual.txt");
+            let report = parse_input("./tests/day02/actual.txt");
             reactor_safety(report)
         }
 
         "example_v2" => {
-            let report = parse_input("./tests/day2/example.txt");
+            let report = parse_input("./tests/day02/example.txt");
             reactor_safety_v2(report)
         }
         "actual_v2" => {
-            let report = parse_input("./tests/day2/actual.txt");
+            let report = parse_input("./tests/day02/actual.txt");
             reactor_safety_v2(report)
-            // part_2(read_to_string("./tests/day2/actual.txt").unwrap())
-            //     .try_into()
-            //     .unwrap()
         }
         _ => todo!(),
     }
@@ -174,9 +171,4 @@ mod tests {
     fn test_example_v2() {
         assert_eq!(main("example_v2"), 4);
     }
-
-    // #[test]
-    // fn test_actual_v2() {
-    //     assert_eq!(main("actual_v2"), 601);
-    // }
 }

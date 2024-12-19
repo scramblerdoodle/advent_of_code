@@ -174,10 +174,10 @@ fn parse_input(filepath: &str) -> Vec<Vec<char>> {
 }
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => match_crosswords(parse_input("./tests/day4/example.txt")),
-        "actual" => match_crosswords(parse_input("./tests/day4/actual.txt")),
-        "example_v2" => match_crosswords_v2(parse_input("./tests/day4/example.txt")),
-        "actual_v2" => match_crosswords_v2(parse_input("./tests/day4/actual.txt")),
+        "example" => match_crosswords(parse_input("./tests/day04/example.txt")),
+        "actual" => match_crosswords(parse_input("./tests/day04/actual.txt")),
+        "example_v2" => match_crosswords_v2(parse_input("./tests/day04/example.txt")),
+        "actual_v2" => match_crosswords_v2(parse_input("./tests/day04/actual.txt")),
         _ => todo!(),
     }
 }
