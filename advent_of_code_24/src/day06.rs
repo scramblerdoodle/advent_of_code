@@ -1,58 +1,22 @@
+use crate::utils::{Board, Direction};
 use std::fs::read_to_string;
 
 #[derive(Clone)]
-enum Direction {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-}
-
-#[derive(Clone)]
 struct GuardBoard {
-    board: Vec<Vec<char>>,
+    board: Board<char>,
     guard_dir: Direction,
     pos: (usize, usize),
-    visited_board: Vec<Vec<i8>>,
+    visited_board: Board<i8>,
     count: u32,
-}
-
-impl Direction {
-    fn next(&self) -> Self {
-        match self {
-            Direction::UP => Direction::RIGHT,
-            Direction::RIGHT => Direction::DOWN,
-            Direction::DOWN => Direction::LEFT,
-            Direction::LEFT => Direction::UP,
-        }
-    }
-
-    fn as_char(&self) -> char {
-        match self {
-            Direction::UP => '^',
-            Direction::RIGHT => '>',
-            Direction::DOWN => 'v',
-            Direction::LEFT => '<',
-        }
-    }
-
-    fn get_step(&self) -> (i8, i8) {
-        match self {
-            Direction::UP => (-1, 0),
-            Direction::RIGHT => (0, 1),
-            Direction::DOWN => (1, 0),
-            Direction::LEFT => (0, -1),
-        }
-    }
 }
 
 impl GuardBoard {
     fn new(board: Vec<Vec<char>>, starting_pos: (usize, usize)) -> Self {
         let guard_dir = match board[starting_pos.0][starting_pos.1] {
-            '^' => Direction::UP,
-            '>' => Direction::RIGHT,
-            'v' => Direction::DOWN,
-            '<' => Direction::LEFT,
+            '^' => Direction::Up,
+            '>' => Direction::Right,
+            'v' => Direction::Down,
+            '<' => Direction::Left,
             other => panic!(
                 "Unmatched direction. Found {other} in pos ({},{}).",
                 starting_pos.0, starting_pos.1
@@ -62,54 +26,41 @@ impl GuardBoard {
         let mut visited_board = vec![vec![0; board[0].len()]; board.len()];
         visited_board[starting_pos.0][starting_pos.1] = 1;
         GuardBoard {
-            board,
+            board: Board::new(board),
             guard_dir,
             pos: starting_pos,
-            visited_board,
+            visited_board: Board::new(visited_board),
             count: 0,
         }
     }
 
     fn walk(mut self) -> u32 {
-        let mut pos = self.pos;
         loop {
-            let step = self.guard_dir.get_step();
-            let next_pos = (pos.0 as i16 + step.0 as i16, pos.1 as i16 + step.1 as i16);
+            // self.print_board();
+            let next_pos = self.board.add_direction(&self.guard_dir, self.pos);
 
-            if next_pos.0 < 0 || next_pos.1 < 0 {
+            if next_pos.is_none() {
                 self.count += 1;
                 break;
             }
 
-            let next_pos = (next_pos.0 as usize, next_pos.1 as usize);
+            let next_pos = next_pos.unwrap();
 
-            match self.board.get(next_pos.0) {
-                None => {
+            match self.board[next_pos.0][next_pos.1] {
+                '.' => {
+                    self.board[self.pos.0][self.pos.1] = 'X';
+                    // self.visited_board[pos.0][pos.1] = true;
+                    self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                    self.pos = next_pos;
                     self.count += 1;
-                    break;
-                } // Out of bounds
-                Some(line) => match line.get(next_pos.1) {
-                    None => {
-                        self.count += 1;
-                        break;
-                    } // Out of bounds
-                    Some(c) => match c {
-                        '.' => {
-                            self.board[pos.0][pos.1] = 'X';
-                            // self.visited_board[pos.0][pos.1] = true;
-                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
-                            pos = next_pos;
-                            self.count += 1;
-                        }
-                        '#' => self.guard_dir = self.guard_dir.next(),
-                        'X' => {
-                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
-                            self.board[pos.0][pos.1] = 'X';
-                            pos = next_pos;
-                        }
-                        other => panic!("Unexpected char {other}"),
-                    },
-                },
+                }
+                '#' => self.guard_dir = self.guard_dir.next_orth(),
+                'X' => {
+                    self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                    self.board[self.pos.0][self.pos.1] = 'X';
+                    self.pos = next_pos;
+                }
+                other => panic!("Unexpected char {other}"),
             }
         }
 
@@ -137,100 +88,77 @@ impl GuardBoard {
 
     fn is_loop(&mut self) -> bool {
         loop {
-            let step = self.guard_dir.get_step();
-            let next_pos = (
-                self.pos.0 as i16 + step.0 as i16,
-                self.pos.1 as i16 + step.1 as i16,
-            );
+            let next_pos = self.board.add_direction(&self.guard_dir, self.pos);
 
-            if next_pos.0 < 0 || next_pos.1 < 0 {
+            if next_pos.is_none() {
                 return false;
             }
 
-            let next_pos = (next_pos.0 as usize, next_pos.1 as usize);
+            let next_pos = next_pos.unwrap();
 
             // Next position
-            match self.board.get(next_pos.0) {
-                None => {
-                    return false;
-                } // Out of bounds
-                Some(line) => match line.get(next_pos.1) {
-                    None => {
-                        return false;
-                    } // Out of bounds
-                    Some(c) => match c {
-                        '.' => {
-                            self.board[self.pos.0][self.pos.1] = 'X';
-                            self.visited_board[next_pos.0][next_pos.1] += 1;
-                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
-                            self.pos = next_pos;
-                        }
-                        '#' | 'O' => {
-                            self.guard_dir = self.guard_dir.next();
-                            self.board[self.pos.0][self.pos.1] = self.guard_dir.as_char();
-                        }
-                        'X' => {
-                            self.visited_board[next_pos.0][next_pos.1] += 1;
-                            if self.visited_board[next_pos.0][next_pos.1] == 4 {
-                                return true;
-                            };
+            match self.board[next_pos.0][next_pos.1] {
+                '.' => {
+                    self.board[self.pos.0][self.pos.1] = 'X';
+                    self.visited_board[next_pos.0][next_pos.1] += 1;
+                    self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                    self.pos = next_pos;
+                }
+                '#' | 'O' => {
+                    self.guard_dir = self.guard_dir.next_orth();
+                    self.board[self.pos.0][self.pos.1] = self.guard_dir.as_char();
+                }
+                'X' => {
+                    self.visited_board[next_pos.0][next_pos.1] += 1;
+                    if self.visited_board[next_pos.0][next_pos.1] == 4 {
+                        return true;
+                    };
 
-                            self.board[self.pos.0][self.pos.1] = 'X';
-                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
-                            self.pos = next_pos;
-                        }
-                        other => panic!("Unexpected char {other}"),
-                    },
-                },
+                    self.board[self.pos.0][self.pos.1] = 'X';
+                    self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                    self.pos = next_pos;
+                }
+                other => panic!("Unexpected char {other}"),
             }
         }
     }
 
+    // This is an incredibly unnefficient solution,
+    // it only exists for printing the board
     fn place_obstacles(mut self) -> u32 {
         loop {
-            let step = self.guard_dir.get_step();
-            let next_pos = (self.pos.0 as i8 + step.0, self.pos.1 as i8 + step.1);
+            let next_pos = self.board.add_direction(&self.guard_dir, self.pos);
 
-            if next_pos.0 < 0 || next_pos.1 < 0 {
+            if next_pos.is_none() {
                 break;
             }
 
-            let next_pos = (next_pos.0 as usize, next_pos.1 as usize);
+            let next_pos = next_pos.unwrap();
 
-            match self.board.get(next_pos.0) {
-                None => {
-                    break;
-                } // Out of bounds
-                Some(line) => match line.get(next_pos.1) {
-                    None => {
-                        break;
-                    } // Out of bounds
-                    Some(c) => match c {
-                        '.' => {
-                            // What happens if we place an obstacle in next_pos?
+            match self.board[next_pos.0][next_pos.1] {
+                '.' => {
+                    // What happens if we place an obstacle in next_pos?
 
-                            let mut self_clone = self.clone();
+                    let mut self_clone = self.clone();
 
-                            self_clone.board[next_pos.0][next_pos.1] = 'O';
+                    self_clone.board[next_pos.0][next_pos.1] = 'O';
 
-                            if self_clone.is_loop() {
-                                self.count += 1;
-                            }
+                    if self_clone.is_loop() {
+                        self.count += 1;
+                    }
 
-                            self.board[self.pos.0][self.pos.1] = 'X';
-                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
-                            self.pos = next_pos;
-                        }
-                        '#' => self.guard_dir = self.guard_dir.next(),
-                        'X' => {
-                            // What happens if we place an obstacle in next_pos?
-                            self.board[self.pos.0][self.pos.1] = 'X';
-                            self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
-                            self.pos = next_pos;
-                        }
-                        other => panic!("Unexpected char {other}"),
-                    },
-                },
+                    self.board[self.pos.0][self.pos.1] = 'X';
+                    self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                    self.pos = next_pos;
+                }
+                '#' => self.guard_dir = self.guard_dir.next_orth(),
+                'X' => {
+                    // What happens if we place an obstacle in next_pos?
+                    self.board[self.pos.0][self.pos.1] = 'X';
+                    self.board[next_pos.0][next_pos.1] = self.guard_dir.as_char();
+                    self.pos = next_pos;
+                }
+                other => panic!("Unexpected char {other}"),
             }
         }
 

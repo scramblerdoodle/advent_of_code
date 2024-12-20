@@ -2,7 +2,7 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::slice::Iter;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Direction {
     Up,
     Right,
@@ -40,8 +40,37 @@ impl Direction {
             Self::UpLeft => (-1, -1),
         }
     }
+
+    pub fn next_orth(&self) -> Self {
+        match self {
+            Direction::Up => Direction::Right,
+            Direction::Right => Direction::Down,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
+            _ => panic!("For diagonals, use `next_diag`. For all directions, use `next_all_dir`"),
+        }
+    }
+
+    pub fn next_diag(&self) -> Self {
+        todo!()
+    }
+
+    pub fn next_all_dir(&self) -> Self {
+        todo!()
+    }
+
+    pub fn as_char(&self) -> char {
+        match self {
+            Direction::Up => '^',
+            Direction::Right => '>',
+            Direction::Down => 'v',
+            Direction::Left => '<',
+            _ => panic!("Diagonals don't support characters yet."),
+        }
+    }
 }
 
+#[derive(Clone)]
 pub struct Board<T> {
     board: Vec<Vec<T>>,
 }
