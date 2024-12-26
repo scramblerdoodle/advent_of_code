@@ -9,6 +9,7 @@ pub mod day08;
 pub mod day09;
 pub mod day10;
 pub mod day11;
+pub mod day12;
 mod utils;
 
 use std::time::Instant;
@@ -68,6 +69,7 @@ fn main() {
             9 => run_inputs(day09::main),
             10 => run_inputs(day10::main),
             11 => run_inputs(day11::main),
+            12 => run_inputs(day12::main),
             _ => todo!(),
         }
     }
