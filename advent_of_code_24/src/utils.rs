@@ -1,6 +1,7 @@
-use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::slice::Iter;
+use std::vec::IntoIter;
+use std::{fmt, slice};
 
 #[derive(Clone, Debug)]
 pub enum Direction {
@@ -119,6 +120,14 @@ impl<T> Board<T> {
     }
 }
 
+impl<T> IntoIterator for Board<T> {
+    type Item = Vec<T>;
+    type IntoIter = IntoIter<Vec<T>>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.board.into_iter()
+    }
+}
+
 impl<T> Index<usize> for Board<T> {
     type Output = Vec<T>;
 
@@ -135,10 +144,23 @@ impl<T> IndexMut<usize> for Board<T> {
     }
 }
 
-impl<T: Clone> fmt::Display for Board<T>
-where
-    u32: From<T>,
-{
+impl fmt::Display for Board<char> {
+    fn fmt(self: &Self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(
+            f,
+            concat!("Board:\n\t{}"),
+            self.board
+                .iter()
+                .map(|v| v.iter().collect())
+                .collect::<Vec<String>>()
+                .join("\n\t"),
+        )
+    }
+}
+
+macro_rules! impl_board_display {
+    (for $($t:ty),+) => {
+        $(impl fmt::Display for Board<$t> {
     fn fmt(self: &Self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(
             f,
@@ -147,10 +169,13 @@ where
                 .iter()
                 .map(|v| v
                     .iter()
-                    .map(|d| char::from_digit(d.clone().try_into().unwrap(), 10).unwrap())
+                    .map(|d| char::from_digit(d.clone().try_into().unwrap(), 10).expect("Type can't be converted into char from digit"))
                     .collect::<String>())
                 .collect::<Vec<String>>()
                 .join("\n\t"),
         )
     }
+        })*
+    }
 }
+impl_board_display!(for bool, u8, u16, u32, u64);
