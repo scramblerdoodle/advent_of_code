@@ -1,6 +1,9 @@
-use std::{collections::VecDeque, fs::read_to_string};
+use std::{
+    collections::{HashMap, VecDeque},
+    fs::read_to_string,
+};
 
-#[derive(Debug)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 struct Stone(u64);
 
 impl Stone {
@@ -27,13 +30,11 @@ impl Stone {
     }
 }
 
-// struct StoneMap(HashMap<Stone, usize>);
+struct StoneVec(VecDeque<Stone>);
 
-struct Stones(VecDeque<Stone>);
-
-impl Stones {
+impl StoneVec {
     fn new(stones: VecDeque<Stone>) -> Self {
-        Stones(stones)
+        StoneVec(stones)
     }
 
     fn len(&self) -> usize {
@@ -61,7 +62,60 @@ impl Stones {
     }
 }
 
-fn day11(mut stones: Stones) -> u32 {
+#[derive(Debug)]
+struct StoneMap(HashMap<Stone, usize>);
+
+impl StoneMap {
+    fn new(stones: HashMap<Stone, usize>) -> Self {
+        StoneMap(stones)
+    }
+
+    fn from_vec(stone_vec: StoneVec) -> Self {
+        let mut stone_map = HashMap::new();
+        for stone in stone_vec.0 {
+            stone_map.insert(stone, 1);
+        }
+        StoneMap(stone_map)
+    }
+
+    fn insert_or_add_count(&mut self, stone: Stone, count: usize) -> &mut usize {
+        self.0
+            .entry(stone)
+            .and_modify(|n| *n += count)
+            .or_insert(count)
+    }
+
+    fn evolve_stones(self) -> Self {
+        let mut next_stones = Self::new(HashMap::new());
+        for (stone, count) in self.0 {
+            if stone.is_engraving_even_digits() {
+                let new_stones = stone.split_stone();
+                next_stones.insert_or_add_count(new_stones.0, count);
+                next_stones.insert_or_add_count(new_stones.1, count);
+            } else {
+                next_stones.insert_or_add_count(stone.change(), count);
+            }
+        }
+        // println!(
+        //     "{}, {}",
+        //     next_stones.count(),
+        //     next_stones
+        //         .0
+        //         .iter()
+        //         .map(|(stone, count)| format!("{}: {count}", stone.0 as u64))
+        //         .collect::<Vec<String>>()
+        //         .join(", ")
+        // );
+        // println!();
+        next_stones
+    }
+
+    fn count(&self) -> u32 {
+        self.0.values().sum::<usize>() as u32
+    }
+}
+
+fn day11(mut stones: StoneVec) -> u32 {
     let blinks = 25;
     for _b in 0..blinks {
         stones = stones.evolve_stones();
@@ -71,18 +125,29 @@ fn day11(mut stones: Stones) -> u32 {
     stones.len() as u32
 }
 
-fn day11_v2(mut stones: Stones) -> u32 {
-    // let blinks = 75;
-    // for _b in 0..blinks {
-    //     stones = stones.evolve_stones();
-    // }
-    //
-    // // println!("{:?}", stones.0);
-    // stones.len() as u32
-    0
+fn day11_v2(stones: StoneVec) -> u32 {
+    let mut stone_map = StoneMap::from_vec(stones);
+    // println!("{:?}", stone_map);
+    // println!(
+    //     "{}, {}",
+    //     stone_map.count(),
+    //     stone_map
+    //         .0
+    //         .iter()
+    //         .map(|(stone, count)| format!("{}: {count}", stone.0 as u64))
+    //         .collect::<Vec<String>>()
+    //         .join(", ")
+    // );
+    // println!();
+    let blinks = 75;
+    for _b in 0..blinks {
+        stone_map = stone_map.evolve_stones();
+    }
+
+    stone_map.count()
 }
 
-fn parse_input(filepath: &str) -> Stones {
+fn parse_input(filepath: &str) -> StoneVec {
     let stones = VecDeque::from_iter(
         read_to_string(filepath)
             .unwrap()
@@ -91,7 +156,7 @@ fn parse_input(filepath: &str) -> Stones {
             .map(|s| Stone(s.parse::<u64>().unwrap())),
     );
 
-    Stones::new(stones)
+    StoneVec::new(stones)
 }
 
 pub fn main(s: &str) -> u32 {
@@ -115,6 +180,11 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 0);
+        assert_eq!(main("example_v2"), 4003138674);
     }
+
+    // #[test]
+    // fn test_actual_v2() {
+    //     assert_eq!(main("actual_v2"), 547791280);
+    // }
 }
