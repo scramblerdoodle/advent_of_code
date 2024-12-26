@@ -10,6 +10,7 @@ pub mod day09;
 pub mod day10;
 pub mod day11;
 pub mod day12;
+pub mod day13;
 mod utils;
 
 use std::time::Instant;
@@ -43,7 +44,7 @@ fn main() {
         let mut input = String::new();
         println!(
             "Choose a Day from {} to {}; 0 exits and input defaults to 0.",
-            1, 11
+            1, 13
         );
         let input = match stdin().read_line(&mut input) {
             Ok(_) => input,
@@ -70,6 +71,7 @@ fn main() {
             10 => run_inputs(day10::main),
             11 => run_inputs(day11::main),
             12 => run_inputs(day12::main),
+            13 => run_inputs(day13::main),
             _ => todo!(),
         }
     }
