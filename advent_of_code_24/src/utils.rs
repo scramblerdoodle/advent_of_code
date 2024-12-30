@@ -111,6 +111,14 @@ impl<T> Board<T> {
         self.board.get(i)
     }
 
+    pub fn get_pos(&self, pos: (usize, usize)) -> Option<&T> {
+        self.get(pos.0).expect("Out of bounds").get(pos.1)
+    }
+
+    pub fn update_pos(&mut self, pos: (usize, usize), value: T) {
+        self.board[pos.0][pos.1] = value
+    }
+
     pub fn add_direction(&self, dir: &Direction, pos: (usize, usize)) -> Option<(usize, usize)> {
         let step = dir.get_direction();
         let (next_i, next_j): (usize, usize);
