@@ -69,11 +69,20 @@ impl Direction {
             _ => panic!("Diagonals don't support characters yet."),
         }
     }
+    pub fn from_char(c: char) -> Self {
+        match c {
+            '^' => Direction::Up,
+            '>' => Direction::Right,
+            'v' => Direction::Down,
+            '<' => Direction::Left,
+            _ => panic!("Diagonals don't support characters yet."),
+        }
+    }
 }
 
 #[derive(Clone)]
 pub struct Board<T> {
-    board: Vec<Vec<T>>,
+    pub board: Vec<Vec<T>>,
 }
 
 impl<T> Board<T> {
