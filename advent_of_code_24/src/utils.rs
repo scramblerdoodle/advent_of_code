@@ -81,6 +81,15 @@ impl<T> Board<T> {
         Board { board }
     }
 
+    pub fn from_size(size: (usize, usize), default: T) -> Self
+    where
+        T: Clone,
+    {
+        Board {
+            board: vec![vec![default; size.1]; size.0],
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.board.len()
     }
