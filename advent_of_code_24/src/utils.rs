@@ -78,6 +78,13 @@ impl Direction {
             _ => panic!("Diagonals don't support characters yet."),
         }
     }
+
+    pub fn is_vertical(&self) -> bool {
+        match self {
+            Direction::Up | Direction::Down => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Clone)]

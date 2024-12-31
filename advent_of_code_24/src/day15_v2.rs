@@ -2,23 +2,22 @@ use std::{fmt, fs::read_to_string};
 
 use crate::utils::{Board, Direction};
 
-use crate::day15_v2::main as main_v2;
-
-#[derive(PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 enum State {
     Wall,
     Empty,
-    Box,
+    BoxLeft,
+    BoxRight,
     Robot,
 }
 
 impl State {
-    fn from_char(c: char) -> State {
+    fn from_char(c: char) -> [State; 2] {
         match c {
-            '#' => State::Wall,
-            '.' => State::Empty,
-            'O' => State::Box,
-            '@' => State::Robot,
+            '#' => [State::Wall; 2],
+            '.' => [State::Empty; 2],
+            'O' => [State::BoxLeft, State::BoxRight],
+            '@' => [State::Robot, State::Empty],
             _ => panic!("Unexpected symbol in input"),
         }
     }
@@ -27,8 +26,17 @@ impl State {
         match self {
             State::Wall => '#',
             State::Empty => '.',
-            State::Box => 'O',
+            State::BoxLeft => '[',
+            State::BoxRight => ']',
             State::Robot => '@',
+        }
+    }
+
+    fn box_other_half_next_pos(&self, pos: (usize, usize)) -> (usize, usize) {
+        match self {
+            State::BoxRight => (pos.0, pos.1 - 1),
+            State::BoxLeft => (pos.0, pos.1 + 1),
+            _ => panic!("Not a box"),
         }
     }
 }
@@ -68,9 +76,19 @@ impl Input {
             State::Wall => {
                 // Do nothing
             }
-            State::Box => {
+            State::BoxLeft | State::BoxRight => {
                 // Try to push box
-                if self.push_box(d, next_pos) {
+                let mut is_pushable = self.is_box_pushable(d, next_pos);
+                if d.is_vertical() {
+                    let other_half_next_pos = next_state.box_other_half_next_pos(next_pos);
+                    is_pushable &= self.is_box_pushable(d, other_half_next_pos);
+
+                    if is_pushable {
+                        self.push_box(d, other_half_next_pos);
+                    }
+                }
+                if is_pushable {
+                    self.push_box(d, next_pos);
                     self.board.update_pos(self.robot_pos, State::Empty);
                     self.board.update_pos(next_pos, State::Robot);
                     self.robot_pos = next_pos;
@@ -78,28 +96,48 @@ impl Input {
             }
             State::Robot => panic!("There should only be one robot"),
         }
-
-        // println!("{}", self.board);
     }
 
-    fn push_box(&mut self, d: &Direction, pos: (usize, usize)) -> bool {
+    fn is_box_pushable(&self, d: &Direction, pos: (usize, usize)) -> bool {
         let next_pos = self.board.add_direction(d, pos).unwrap();
         let next_state = self.board.get_pos(next_pos).unwrap();
 
         match *next_state {
-            State::Empty => {
-                self.board.update_pos(pos, State::Empty);
-                self.board.update_pos(next_pos, State::Box);
-                true
-            }
+            State::Empty => true,
             State::Wall => false,
-            State::Box => {
-                let is_box_pushable = self.push_box(d, next_pos);
-                if is_box_pushable {
-                    self.board.update_pos(pos, State::Empty);
-                    self.board.update_pos(next_pos, State::Box);
+            State::BoxLeft | State::BoxRight => {
+                if d.is_vertical() {
+                    let other_half_next_pos = next_state.box_other_half_next_pos(next_pos);
+                    self.is_box_pushable(d, next_pos)
+                        && self.is_box_pushable(d, other_half_next_pos)
+                } else {
+                    self.is_box_pushable(d, next_pos)
                 }
-                is_box_pushable
+            }
+            State::Robot => panic!("How is the Robot pushing the box unto itself"),
+        }
+    }
+
+    fn push_box(&mut self, d: &Direction, pos: (usize, usize)) {
+        let next_pos = self.board.add_direction(d, pos).unwrap();
+        let next_state = self.board.get_pos(next_pos).unwrap();
+        let curr_state = self.board.get_pos(pos).unwrap().clone();
+
+        match *next_state {
+            State::Empty => {
+                self.board.update_pos(next_pos, curr_state);
+                self.board.update_pos(pos, State::Empty);
+            }
+            State::Wall => panic!("I don't think this should happen"),
+            State::BoxLeft | State::BoxRight => {
+                if d.is_vertical() {
+                    let other_half_next_pos = next_state.box_other_half_next_pos(next_pos);
+                    self.push_box(d, other_half_next_pos);
+                }
+                self.push_box(d, next_pos);
+
+                self.board.update_pos(next_pos, curr_state);
+                self.board.update_pos(pos, State::Empty);
             }
             State::Robot => panic!("How is the Robot pushing the box unto itself"),
         }
@@ -109,7 +147,7 @@ impl Input {
         let mut result = 0;
         for i in 0..self.board.len() {
             for j in 0..self.board[i].len() {
-                if self.board[i][j] == State::Box {
+                if self.board[i][j] == State::BoxLeft {
                     result += 100 * i + j;
                 }
             }
@@ -119,7 +157,7 @@ impl Input {
     }
 }
 
-fn day15(mut input: Input) -> u32 {
+fn day15_v2(mut input: Input) -> u32 {
     for d in input.moves.clone() {
         input.move_robot(&d);
     }
@@ -144,7 +182,8 @@ fn parse_input(filepath: &str) -> Input {
                     board.push(
                         l.chars()
                             .map(|c| State::from_char(c))
-                            .collect::<Vec<State>>(),
+                            .collect::<Vec<[State; 2]>>()
+                            .into_flattened(),
                     );
                 }
                 ReadingMode::Moves => {
@@ -154,12 +193,12 @@ fn parse_input(filepath: &str) -> Input {
         }
     });
 
-    // TODO: Could be refactored
     let mut robot_pos: (usize, usize) = (0, 0);
     for i in 0..board.len() {
         for j in 0..board[i].len() {
             if board[i][j] == State::Robot {
                 robot_pos = (i, j);
+                board[i][j + 1] = State::Empty;
             }
         }
     }
@@ -174,10 +213,8 @@ fn parse_input(filepath: &str) -> Input {
 
 pub fn main(s: &str) -> u32 {
     match s {
-        "example" => day15(parse_input("./tests/day15/example.txt")),
-        "actual" => day15(parse_input("./tests/day15/actual.txt")),
-        "example_v2" => main_v2("example_v2"),
-        "actual_v2" => main_v2("actual_v2"),
+        "example_v2" => day15_v2(parse_input("./tests/day15/example.txt")),
+        "actual_v2" => day15_v2(parse_input("./tests/day15/actual.txt")),
         _ => todo!(),
     }
 }
@@ -187,7 +224,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_example() {
-        assert_eq!(main("example"), 10092);
+    fn test_example_v2() {
+        assert_eq!(main("example_v2"), 9021);
     }
 }
