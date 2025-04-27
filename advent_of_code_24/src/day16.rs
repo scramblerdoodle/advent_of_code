@@ -1,6 +1,6 @@
 use std::{fmt, fs::read_to_string};
 
-use crate::utils::{Board, Direction};
+use crate::utils::{get_test_file, Board, Direction, FileNotFound, ACTUAL, EXAMPLE};
 
 enum State {
     Start,
@@ -159,14 +159,32 @@ fn parse_input(filepath: &str) -> Input {
     Input::new(board)
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day16(parse_input("./tests/day16/example.txt")),
-        "example2" => day16(parse_input("./tests/day16/example2.txt")),
-        "actual" => day16(parse_input("./tests/day16/actual.txt")),
-        "example_v2" => day16_v2(parse_input("./tests/day16/example.txt")),
-        "example2_v2" => day16_v2(parse_input("./tests/day16/example2.txt")),
-        "actual_v2" => day16_v2(parse_input("./tests/day16/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "16") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day16(parse_input(&file))),
+        },
+        "example2" => match get_test_file(EXAMPLE, "16_2") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day16(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "16") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day16(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "16") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day16_v2(parse_input(&file))),
+        },
+        "example2_v2" => match get_test_file(EXAMPLE, "16_2") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day16_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "16") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day16_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -177,26 +195,26 @@ mod tests {
 
     #[test]
     fn test_example_1() {
-        assert_eq!(main("example"), 7036);
+        assert_eq!(main("example").unwrap(), 7036);
     }
 
     #[test]
     fn test_example_2() {
-        assert_eq!(main("example2"), 11048);
+        assert_eq!(main("example2").unwrap(), 11048);
     }
 
     #[test]
     fn test_example_1_v2() {
-        assert_eq!(main("example_v2"), 0);
+        assert_eq!(main("example_v2").unwrap(), 0);
     }
 
     #[test]
     fn test_example_2_v2() {
-        assert_eq!(main("example2_v2"), 0);
+        assert_eq!(main("example2_v2").unwrap(), 0);
     }
 
-    #[test]
-    fn test_actual() {
-        assert!(main("actual") < 215808);
-    }
+    // #[test]
+    // fn test_actual() {
+    //     assert!(main("actual").unwrap() < 215808);
+    // }
 }

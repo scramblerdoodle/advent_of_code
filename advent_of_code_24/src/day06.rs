@@ -1,4 +1,4 @@
-use crate::utils::{Board, Direction};
+use crate::utils::{get_test_file, Board, Direction, FileNotFound, ACTUAL, EXAMPLE};
 use std::fs::read_to_string;
 
 #[derive(Clone)]
@@ -199,12 +199,24 @@ fn parse_input(file_path: &str) -> GuardBoard {
     GuardBoard::new(board, starting_pos)
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day6(parse_input("./tests/day06/example.txt")),
-        "actual" => day6(parse_input("./tests/day06/actual.txt")),
-        "example_v2" => day6_v2(parse_input("./tests/day06/example.txt")),
-        "actual_v2" => day6_v2(parse_input("./tests/day06/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "06") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day6(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "06") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day6(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "06") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day6_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "06") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day6_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -215,10 +227,10 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 41);
+        assert_eq!(main("example").unwrap(), 41);
     }
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 6);
+        assert_eq!(main("example_v2").unwrap(), 6);
     }
 }

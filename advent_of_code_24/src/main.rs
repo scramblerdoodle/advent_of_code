@@ -29,9 +29,10 @@ mod utils;
 use std::time::Instant;
 use std::{fmt, io::stdin};
 
-fn run_inputs<T>(f: fn(&str) -> T)
+fn run_inputs<T, E>(f: fn(&str) -> Result<T, E>)
 where
     T: fmt::Display,
+    E: fmt::Display,
 {
     let inputs = vec![
         ("Example", "example"),
@@ -42,12 +43,15 @@ where
     for (name, path) in inputs {
         let now = Instant::now();
 
-        {
-            println!("{}: {}", name, f(path));
-        }
+        match f(path) {
+            Ok(result) => {
+                println!("{name}: {result}");
 
-        let elapsed = now.elapsed();
-        println!("\tElapsed: {:.2?}", elapsed);
+                let elapsed = now.elapsed();
+                println!("\tElapsed: {:.2?}", elapsed);
+            }
+            Err(err) => println!("{name}: ERROR! {err}"),
+        }
     }
     println!();
 }

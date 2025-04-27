@@ -3,6 +3,8 @@ use std::{
     fs::read_to_string,
 };
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 #[derive(Debug, Hash, PartialEq, Eq)]
 struct Stone(u64);
 
@@ -159,12 +161,24 @@ fn parse_input(filepath: &str) -> StoneVec {
     StoneVec::new(stones)
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day11(parse_input("./tests/day11/example.txt")),
-        "actual" => day11(parse_input("./tests/day11/actual.txt")),
-        "example_v2" => day11_v2(parse_input("./tests/day11/example.txt")),
-        "actual_v2" => day11_v2(parse_input("./tests/day11/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "11") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day11(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "11") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day11(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "11") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day11_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "11") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day11_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -175,16 +189,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 55312);
+        assert_eq!(main("example").unwrap(), 55312);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 4003138674);
+        assert_eq!(main("example_v2").unwrap(), 4003138674);
     }
-
-    // #[test]
-    // fn test_actual_v2() {
-    //     assert_eq!(main("actual_v2"), 547791280);
-    // }
 }

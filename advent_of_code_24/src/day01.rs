@@ -1,6 +1,7 @@
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
 use std::{collections::HashMap, fs::read_to_string};
 
-fn parse_input(filepath: &str) -> (Vec<i32>, Vec<i32>) {
+fn parse_input(filepath: String) -> (Vec<i32>, Vec<i32>) {
     let mut list_one: Vec<i32> = vec![];
     let mut list_two: Vec<i32> = vec![];
     read_to_string(filepath).unwrap().lines().for_each(|l| {
@@ -33,25 +34,36 @@ fn match_list_v2(l1: Vec<i32>, l2: Vec<i32>) -> i32 {
         .sum()
 }
 
-pub fn main(s: &str) -> i32 {
+pub fn main(s: &str) -> Result<i32, FileNotFound> {
     match s {
-        "example" => {
-            let (l1, l2) = parse_input("./tests/day01/example.txt");
-            match_list(l1, l2)
-        }
-        "actual" => {
-            let (l1, l2) = parse_input("./tests/day01/actual.txt");
-            match_list(l1, l2)
-        }
-
-        "example_v2" => {
-            let (l1, l2) = parse_input("./tests/day01/example.txt");
-            match_list_v2(l1, l2)
-        }
-        "actual_v2" => {
-            let (l1, l2) = parse_input("./tests/day01/actual.txt");
-            match_list_v2(l1, l2)
-        }
+        "example" => match get_test_file(EXAMPLE, "01") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let (l1, l2) = parse_input(file);
+                Ok(match_list(l1, l2))
+            }
+        },
+        "actual" => match get_test_file(ACTUAL, "01") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let (l1, l2) = parse_input(file);
+                Ok(match_list(l1, l2))
+            }
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "01") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let (l1, l2) = parse_input(file);
+                Ok(match_list_v2(l1, l2))
+            }
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "01") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let (l1, l2) = parse_input(file);
+                Ok(match_list_v2(l1, l2))
+            }
+        },
         _ => todo!(),
     }
 }
@@ -62,11 +74,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 11);
+        assert_eq!(main("example").unwrap(), 11);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 31);
+        assert_eq!(main("example_v2").unwrap(), 31);
     }
 }

@@ -1,3 +1,4 @@
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
 use crate::utils::{Board, Direction};
 use std::fs::read_to_string;
 
@@ -108,12 +109,24 @@ fn parse_input(filepath: &str) -> Board<char> {
     Board::new(result)
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => match_crosswords(parse_input("./tests/day04/example.txt")),
-        "actual" => match_crosswords(parse_input("./tests/day04/actual.txt")),
-        "example_v2" => match_crosswords_v2(parse_input("./tests/day04/example.txt")),
-        "actual_v2" => match_crosswords_v2(parse_input("./tests/day04/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "04") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(match_crosswords(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "04") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(match_crosswords(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "04") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(match_crosswords_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "04") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(match_crosswords_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -124,11 +137,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 18);
+        assert_eq!(main("example").unwrap(), 18);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 9);
+        assert_eq!(main("example_v2").unwrap(), 9);
     }
 }

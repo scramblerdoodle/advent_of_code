@@ -1,5 +1,7 @@
 use std::{fs::read_to_string, str::Split};
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 enum State {
     A,
     B,
@@ -137,12 +139,24 @@ fn parse_input(filepath: &str) -> Input {
     Input { input: result }
 }
 
-pub fn main(s: &str) -> i64 {
+pub fn main(s: &str) -> Result<i64, FileNotFound> {
     match s {
-        "example" => day13(parse_input("./tests/day13/example.txt")),
-        "actual" => day13(parse_input("./tests/day13/actual.txt")),
-        "example_v2" => day13_v2(parse_input("./tests/day13/example.txt")),
-        "actual_v2" => day13_v2(parse_input("./tests/day13/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "13") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day13(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "13") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day13(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "13") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day13_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "13") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day13_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -153,11 +167,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 480);
+        assert_eq!(main("example").unwrap(), 480);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 875318608908);
+        assert_eq!(main("example_v2").unwrap(), 875318608908);
     }
 }

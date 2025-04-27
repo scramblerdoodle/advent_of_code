@@ -1,5 +1,7 @@
 use std::{fmt, fs::read_to_string};
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 enum Quadrant {
     UL,
     UR,
@@ -155,12 +157,24 @@ fn parse_input(filepath: &str, board_size: (usize, usize)) -> RobotBoard {
     RobotBoard { robots, board_size }
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day14(parse_input("./tests/day14/example.txt", (11, 7))),
-        "actual" => day14(parse_input("./tests/day14/actual.txt", (101, 103))),
-        "example_v2" => day14_v2(parse_input("./tests/day14/example.txt", (11, 7))),
-        "actual_v2" => day14_v2(parse_input("./tests/day14/actual.txt", (101, 103))),
+        "example" => match get_test_file(EXAMPLE, "14") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day14(parse_input(&file, (11, 7)))),
+        },
+        "actual" => match get_test_file(ACTUAL, "14") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day14(parse_input(&file, (101, 103)))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "14") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day14_v2(parse_input(&file, (11, 7)))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "14") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day14_v2(parse_input(&file, (101, 103)))),
+        },
         _ => todo!(),
     }
 }
@@ -171,16 +185,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 12);
+        assert_eq!(main("example").unwrap(), 12);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 0);
-    }
-
-    #[test]
-    fn test_actual_v2() {
-        assert_eq!(main("actual_v2"), 7051);
+        assert_eq!(main("example_v2").unwrap(), 0);
     }
 }

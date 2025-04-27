@@ -1,6 +1,6 @@
 use std::{fmt, fs::read_to_string};
 
-use crate::utils::{Board, Direction};
+use crate::utils::{get_test_file, Board, Direction, FileNotFound, ACTUAL, EXAMPLE};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum State {
@@ -211,10 +211,16 @@ fn parse_input(filepath: &str) -> Input {
     input
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example_v2" => day15_v2(parse_input("./tests/day15/example.txt")),
-        "actual_v2" => day15_v2(parse_input("./tests/day15/actual.txt")),
+        "example_v2" => match get_test_file(EXAMPLE, "15") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day15_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "15") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day15_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -225,6 +231,6 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 9021);
+        assert_eq!(main("example_v2").unwrap(), 9021);
     }
 }

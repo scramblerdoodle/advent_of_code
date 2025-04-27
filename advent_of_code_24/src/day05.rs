@@ -1,5 +1,7 @@
 use std::{cmp::Ordering, collections::HashSet, fs::read_to_string};
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 #[derive(Debug)]
 struct Orders {
     rules: Vec<(String, String)>,
@@ -135,12 +137,24 @@ fn parse_text(file_path: &str) -> Orders {
     }
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day5(parse_text("./tests/day05/example.txt")),
-        "actual" => day5(parse_text("./tests/day05/actual.txt")),
-        "example_v2" => day5_v2(parse_text("./tests/day05/example.txt")),
-        "actual_v2" => day5_v2(parse_text("./tests/day05/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "05") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day5(parse_text(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "05") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day5(parse_text(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "05") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day5_v2(parse_text(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "05") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day5_v2(parse_text(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -151,10 +165,10 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 143);
+        assert_eq!(main("example").unwrap(), 143);
     }
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 123);
+        assert_eq!(main("example_v2").unwrap(), 123);
     }
 }

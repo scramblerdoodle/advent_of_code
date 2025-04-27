@@ -1,5 +1,6 @@
 use std::fmt;
 use std::ops::{Index, IndexMut};
+use std::path::Path;
 use std::slice::Iter;
 use std::vec::IntoIter;
 
@@ -212,3 +213,23 @@ macro_rules! impl_board_display {
     }
 }
 impl_board_display!(for bool, u8, u16, u32, u64);
+
+#[derive(Debug)]
+pub struct FileNotFound;
+impl fmt::Display for FileNotFound {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "file not found")
+    }
+}
+
+pub const EXAMPLE: &str = "tests";
+pub const ACTUAL: &str = ".tests";
+
+pub fn get_test_file(path: &str, d: &str) -> Result<String, FileNotFound> {
+    let file_path = format!("./{path}/day{d}.txt");
+    if Path::new(&file_path).exists() {
+        Ok(file_path)
+    } else {
+        Err(FileNotFound)
+    }
+}

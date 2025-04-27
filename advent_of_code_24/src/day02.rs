@@ -1,3 +1,4 @@
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
 use std::fs::read_to_string;
 
 enum State {
@@ -135,25 +136,36 @@ fn parse_input(filepath: &str) -> Vec<Vec<i32>> {
     result
 }
 
-pub fn main(s: &str) -> i32 {
+pub fn main(s: &str) -> Result<i32, FileNotFound> {
     match s {
-        "example" => {
-            let report = parse_input("./tests/day02/example.txt");
-            reactor_safety(report)
-        }
-        "actual" => {
-            let report = parse_input("./tests/day02/actual.txt");
-            reactor_safety(report)
-        }
-
-        "example_v2" => {
-            let report = parse_input("./tests/day02/example.txt");
-            reactor_safety_v2(report)
-        }
-        "actual_v2" => {
-            let report = parse_input("./tests/day02/actual.txt");
-            reactor_safety_v2(report)
-        }
+        "example" => match get_test_file(EXAMPLE, "02") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let report = parse_input(&file);
+                Ok(reactor_safety(report))
+            }
+        },
+        "actual" => match get_test_file(ACTUAL, "02") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let report = parse_input(&file);
+                Ok(reactor_safety(report))
+            }
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "02") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let report = parse_input(&file);
+                Ok(reactor_safety_v2(report))
+            }
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "02") {
+            Err(err) => Err(err),
+            Ok(file) => {
+                let report = parse_input(&file);
+                Ok(reactor_safety_v2(report))
+            }
+        },
         _ => todo!(),
     }
 }
@@ -164,11 +176,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 2);
+        assert_eq!(main("example").unwrap(), 2);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 4);
+        assert_eq!(main("example_v2").unwrap(), 4);
     }
 }

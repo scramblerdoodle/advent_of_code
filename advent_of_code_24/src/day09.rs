@@ -1,6 +1,8 @@
 use std::fmt;
 use std::{fs::read_to_string, num::ParseIntError};
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 enum State {
     FILE,
@@ -250,15 +252,26 @@ fn parse_input(filepath: &str) -> Input {
     result
 }
 
-pub fn main(s: &str) -> u64 {
-    let result = match s {
-        "example" => day9(parse_input("./tests/day09/example.txt")),
-        "actual" => day9(parse_input("./tests/day09/actual.txt")),
-        "example_v2" => day9_v2(parse_input("./tests/day09/example.txt")),
-        "actual_v2" => day9_v2(parse_input("./tests/day09/actual.txt")),
+pub fn main(s: &str) -> Result<u64, FileNotFound> {
+    match s {
+        "example" => match get_test_file(EXAMPLE, "09") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day9(parse_input(&file)).unwrap()),
+        },
+        "actual" => match get_test_file(ACTUAL, "09") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day9(parse_input(&file)).unwrap()),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "09") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day9_v2(parse_input(&file)).unwrap()),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "09") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day9_v2(parse_input(&file)).unwrap()),
+        },
         _ => todo!(),
-    };
-    result.unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -267,13 +280,13 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 1928);
+        assert_eq!(main("example").unwrap(), 1928);
     }
 
     #[test]
     fn test_input() {
         assert_eq!(
-            parse_input("./tests/day09/example.txt")
+            parse_input(&get_test_file(EXAMPLE, "09").unwrap())
                 .file_blocks
                 .to_string(),
             "00...111...2...333.44.5555.6666.777.888899".to_string()
@@ -282,6 +295,6 @@ mod tests {
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 2858);
+        assert_eq!(main("example_v2").unwrap(), 2858);
     }
 }

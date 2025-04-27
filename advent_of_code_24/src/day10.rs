@@ -1,4 +1,4 @@
-use crate::utils::{Board, Direction};
+use crate::utils::{get_test_file, Board, Direction, FileNotFound, ACTUAL, EXAMPLE};
 use std::{fmt, fs::read_to_string};
 
 struct TrailMap {
@@ -127,12 +127,24 @@ fn parse_input(filepath: &str) -> TrailMap {
     TrailMap::new(trail_map)
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day10(parse_input("./tests/day10/example.txt")),
-        "actual" => day10(parse_input("./tests/day10/actual.txt")),
-        "example_v2" => day10_v2(parse_input("./tests/day10/example.txt")),
-        "actual_v2" => day10_v2(parse_input("./tests/day10/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "10") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day10(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "10") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day10(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "10") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day10_v2(parse_input(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "10") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day10_v2(parse_input(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -143,11 +155,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 36);
+        assert_eq!(main("example").unwrap(), 36);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 81);
+        assert_eq!(main("example_v2").unwrap(), 81);
     }
 }

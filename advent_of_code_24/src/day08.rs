@@ -6,6 +6,8 @@ use std::{
 
 use combinatorial::Combinations;
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 #[derive(Debug)]
 struct Input {
     size: (usize, usize),
@@ -178,12 +180,24 @@ fn parse_input(filepath: &str) -> Input {
     result
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day8(parse_input("./tests/day08/example.txt")).unwrap(),
-        "actual" => day8(parse_input("./tests/day08/actual.txt")).unwrap(),
-        "example_v2" => day8_v2(parse_input("./tests/day08/example.txt")).unwrap(),
-        "actual_v2" => day8_v2(parse_input("./tests/day08/actual.txt")).unwrap(),
+        "example" => match get_test_file(EXAMPLE, "08") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day8(parse_input(&file)).unwrap()),
+        },
+        "actual" => match get_test_file(ACTUAL, "08") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day8(parse_input(&file)).unwrap()),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "08") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day8_v2(parse_input(&file)).unwrap()),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "08") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day8_v2(parse_input(&file)).unwrap()),
+        },
         _ => todo!(),
     }
 }
@@ -194,11 +208,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 14);
+        assert_eq!(main("example").unwrap(), 14);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 34);
+        assert_eq!(main("example_v2").unwrap(), 34);
     }
 }

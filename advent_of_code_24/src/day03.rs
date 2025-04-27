@@ -1,3 +1,4 @@
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
 use regex::Regex;
 use std::fs::read_to_string;
 
@@ -62,12 +63,24 @@ fn compute_tokens(filepath: &str) -> u32 {
     result
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => compute_tokens("./tests/day03/example.txt"),
-        "actual" => compute_tokens("./tests/day03/actual.txt"),
-        "example_v2" => compute_tokens_v2("./tests/day03/example.txt"),
-        "actual_v2" => compute_tokens_v2("./tests/day03/actual.txt"),
+        "example" => match get_test_file(EXAMPLE, "03") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(compute_tokens(&file)),
+        },
+        "actual" => match get_test_file(ACTUAL, "03") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(compute_tokens(&file)),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "03") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(compute_tokens_v2(&file)),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "03") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(compute_tokens_v2(&file)),
+        },
         _ => todo!(),
     }
 }
@@ -78,16 +91,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 161);
+        assert_eq!(main("example").unwrap(), 161);
     }
 
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 8 * 5);
-    }
-
-    #[test]
-    fn test_actual() {
-        assert!(main("actual") > 157725712);
+        assert_eq!(main("example_v2").unwrap(), 8 * 5);
     }
 }

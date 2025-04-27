@@ -1,5 +1,7 @@
 use std::fs::read_to_string;
 
+use crate::utils::{get_test_file, FileNotFound, ACTUAL, EXAMPLE};
+
 #[derive(Debug, Clone)]
 enum Operation {
     SUM,
@@ -246,12 +248,24 @@ fn parse_input_v2(file_path: &str) -> Vec<Equation> {
     input
 }
 
-pub fn main(s: &str) -> u64 {
+pub fn main(s: &str) -> Result<u64, FileNotFound> {
     match s {
-        "example" => day7(parse_input("./tests/day07/example.txt")),
-        "actual" => day7(parse_input("./tests/day07/actual.txt")),
-        "example_v2" => day7_v2(parse_input_v2("./tests/day07/example.txt")),
-        "actual_v2" => day7_v2(parse_input_v2("./tests/day07/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "07") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day7(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "07") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day7(parse_input(&file))),
+        },
+        "example_v2" => match get_test_file(EXAMPLE, "07") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day7_v2(parse_input_v2(&file))),
+        },
+        "actual_v2" => match get_test_file(ACTUAL, "07") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day7_v2(parse_input_v2(&file))),
+        },
         _ => todo!(),
     }
 }
@@ -262,11 +276,11 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 3749);
+        assert_eq!(main("example").unwrap(), 3749);
     }
     #[test]
     fn test_example_v2() {
-        assert_eq!(main("example_v2"), 11387);
+        assert_eq!(main("example_v2").unwrap(), 11387);
     }
 
     #[test]

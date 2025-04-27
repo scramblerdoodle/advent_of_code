@@ -1,6 +1,6 @@
 use std::{fmt, fs::read_to_string};
 
-use crate::utils::{Board, Direction};
+use crate::utils::{get_test_file, Board, Direction, FileNotFound, ACTUAL, EXAMPLE};
 
 use crate::day15_v2::main as main_v2;
 
@@ -172,10 +172,16 @@ fn parse_input(filepath: &str) -> Input {
     input
 }
 
-pub fn main(s: &str) -> u32 {
+pub fn main(s: &str) -> Result<u32, FileNotFound> {
     match s {
-        "example" => day15(parse_input("./tests/day15/example.txt")),
-        "actual" => day15(parse_input("./tests/day15/actual.txt")),
+        "example" => match get_test_file(EXAMPLE, "15") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day15(parse_input(&file))),
+        },
+        "actual" => match get_test_file(ACTUAL, "15") {
+            Err(err) => Err(err),
+            Ok(file) => Ok(day15(parse_input(&file))),
+        },
         "example_v2" => main_v2("example_v2"),
         "actual_v2" => main_v2("actual_v2"),
         _ => todo!(),
@@ -188,6 +194,6 @@ mod tests {
 
     #[test]
     fn test_example() {
-        assert_eq!(main("example"), 10092);
+        assert_eq!(main("example").unwrap(), 10092);
     }
 }
