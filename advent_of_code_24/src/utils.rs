@@ -1,9 +1,9 @@
+use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::slice::Iter;
 use std::vec::IntoIter;
-use std::{fmt, slice};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum Direction {
     Up,
     Right,
