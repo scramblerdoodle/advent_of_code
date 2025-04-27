@@ -16,6 +16,7 @@ pub enum Direction {
     UpLeft,
 }
 
+#[allow(dead_code)]
 impl Direction {
     pub const ORTHOGONALS: [Self; 4] = [Self::Up, Self::Right, Self::Down, Self::Left];
     pub const DIAGONALS: [Self; 4] = [Self::UpRight, Self::DownRight, Self::DownLeft, Self::UpLeft];
@@ -93,6 +94,7 @@ pub struct Board<T> {
     pub board: Vec<Vec<T>>,
 }
 
+#[allow(dead_code)]
 impl<T> Board<T> {
     pub fn new(board: Vec<Vec<T>>) -> Self {
         Board { board }

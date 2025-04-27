@@ -73,7 +73,7 @@ fn day12(mut garden: Garden) -> u32 {
     result
 }
 
-fn day12_v2(garden: Garden) -> u32 {
+fn day12_v2(_garden: Garden) -> u32 {
     // println!("{}", garden.board);
     // println!("{}", garden.visited);
     0
