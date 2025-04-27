@@ -7,7 +7,7 @@ enum State {
     End,
     Wall,
     Empty,
-    Visited(Direction),
+    Visited(Direction, u32),
 }
 
 impl State {
@@ -27,7 +27,7 @@ impl State {
             State::Empty => '.',
             State::Start => 'S',
             State::End => 'E',
-            State::Visited(d) => d.as_char(),
+            State::Visited(d, _) => d.as_char(),
         }
     }
 }
@@ -44,6 +44,13 @@ impl fmt::Display for Board<State> {
                 .join("\n\t"),
         )
     }
+}
+
+#[derive(PartialEq)]
+struct Node {
+    score: u32,
+    pos: (usize, usize),
+    dir: Direction,
 }
 
 struct Input {
@@ -73,75 +80,141 @@ impl Input {
         }
     }
 
-    // FIXME: THIS IS INSANELY COMPLEX
-    //        Change it to implement a modified BFS with priority queue for lowest score
-    fn walk(&mut self, pos: (usize, usize), curr_dir: &Direction, score: u32) {
-        /*
-         * General idea:
-         *   first step: set start as visited, dir EAST
-         *
-         *   Recursive:
-         *   set pos as visited
-         *   Iterate over Direction::ORTHOGONALS (Up, Right, Down, Left),
-         *       match next_pos
-         *           wall | visited: stop
-         *           empty: acc score, add 1000 if new direction != curr direction; walk
-         *           end: add 1 step; update min
-         *           start: panic (shouldnt happen)
-         *
-         *       when coming back, unset visited, figure out if acc is being reduced
-         *       (should be if on stack)
-         */
-
-        // 1. Set pos as visited
-        self.board.update_pos(pos, State::Visited(curr_dir.clone()));
-
-        // 2. Iterate over orthogonals
-        for d in &Direction::ORTHOGONALS {
-            let next_pos = self.board.add_direction(d, pos).unwrap();
-            let next_state = self.board.get_pos(next_pos).unwrap();
-
-            match next_state {
-                State::Wall | State::Visited(_) => {}
-                State::Empty => {
-                    let mut new_score = score + 1;
-                    if *d != *curr_dir {
-                        new_score += 1000;
-                    }
-
-                    if new_score < self.minimum_score {
-                        self.walk(next_pos, d, new_score);
-                    }
-                }
-                State::End => {
-                    self.update_min(score + 1);
-                }
-                State::Start => panic!("How"),
-            }
-        }
-
-        // 3. At the end, unvisit pos
-        self.board.update_pos(pos, State::Empty);
-    }
-
     fn update_min(&mut self, other: u32) {
         if self.minimum_score > other {
             self.minimum_score = other;
 
-            println!("Min: {}\n{}", self.minimum_score, self.board);
+            // println!("Min: {}\n{}", self.minimum_score, self.board);
+        }
+    }
+    fn walk(&mut self, start: (usize, usize)) {
+        /* Approach:
+         *   All visited positions in board will have a score
+         *   Queue structure: Vec<(score, pos<usize, usize>)>
+         *   Add start to queue with score 0
+         *   Init minimum score as +INF
+         *
+         *   While queue is not empty
+         *       pos = pop lowest scored position in queue # be careful about this, could increase
+         *       complexity by a lot -- maybe use priority queue
+         *       For each valid direction from pos
+         *           If Empty
+         *               Compute score
+         *               if score < minimum score:
+         *                  update as visited with score
+         *                  add to queue (score, pos)
+         *           If Visited
+         *               Compute score
+         *               If score would be lower by visiting it through new path and score <
+         *               minimum score:
+         *                   update position's score in board
+         *                   add to queue (score, pos) # not sure, this would create some overhead I
+         *                   # think? I think it's necessary for computing shortest path but there's a part of me that
+         *                   # thinks just woulnd't ever happen
+         *               else continue
+         *           If Start
+         *               Continue
+         *           If Wall
+         *               Continue
+         *           If End
+         *               Update as visited with score
+         *               Set minimum score as end score
+         *
+         */
+
+        // Init queue with starting position
+        let mut queue: Vec<Node> = vec![Node {
+            score: 0,
+            pos: start,
+            dir: Direction::Right,
+        }];
+
+        while !queue.is_empty() {
+            // Get min score from queue
+            if let Some(lowest_scored_pos) = queue.iter().min_by_key(|x| x.score) {
+                let curr_score = lowest_scored_pos.score;
+                let curr_pos = lowest_scored_pos.pos;
+                let prev_dir = lowest_scored_pos.dir;
+
+                // println!("{}", self.board);
+                // println!("Curr pos:{:?}", curr_pos);
+
+                queue.remove(queue.iter().position(|x| x == lowest_scored_pos).unwrap());
+
+                for d in &Direction::ORTHOGONALS {
+                    let next_pos = self.board.add_direction(d, curr_pos).unwrap();
+                    let next_state = self.board.get_pos(next_pos).unwrap();
+                    // println!(
+                    //     "Dir: {:?}, Next pos: {:?}, Next state: {:?}",
+                    //     d,
+                    //     next_pos,
+                    //     next_state.to_char()
+                    // );
+
+                    match next_state {
+                        State::Wall | State::Start => {}
+                        State::Empty => {
+                            // Compute score
+                            let mut new_score = curr_score;
+                            if *d != prev_dir {
+                                new_score += 1000;
+                            }
+                            new_score += 1;
+
+                            // If score goes beyond minimum score, no use computing it
+                            if new_score < self.minimum_score {
+                                self.board
+                                    .update_pos(next_pos, State::Visited(*d, new_score));
+
+                                queue.push(Node {
+                                    score: new_score,
+                                    pos: next_pos,
+                                    dir: *d,
+                                });
+                            }
+                        }
+                        State::Visited(d, s) => {
+                            // Compute score
+                            let mut new_score = curr_score;
+                            if *d != prev_dir {
+                                new_score += 1000;
+                            }
+                            new_score += 1;
+
+                            // If score goes beyond minimum score or visited already has lower
+                            // score, no use computing it
+                            if new_score < *s && new_score < self.minimum_score {
+                                // Add to queue (score, pos)
+                                queue.push(Node {
+                                    score: new_score,
+                                    pos: next_pos,
+                                    dir: d.clone(),
+                                });
+
+                                self.board
+                                    .update_pos(next_pos, State::Visited(*d, new_score));
+                            }
+                        }
+                        State::End => {
+                            // Set minimum score, with sanity check
+                            if curr_score < self.minimum_score {
+                                self.update_min(curr_score + 1);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 fn day16(mut input: Input) -> u32 {
-    println!("{}", input.board);
-
-    input.walk(input.start, &Direction::Right, 0);
+    input.walk(input.start);
     input.minimum_score
 }
 
-fn day16_v2(input: Input) -> u32 {
-    let mut result: u32 = 0;
+fn day16_v2(_input: Input) -> u32 {
+    let result: u32 = 0;
     result
 }
 
@@ -212,9 +285,4 @@ mod tests {
     fn test_example_2_v2() {
         assert_eq!(main("example2_v2").unwrap(), 0);
     }
-
-    // #[test]
-    // fn test_actual() {
-    //     assert!(main("actual").unwrap() < 215808);
-    // }
 }

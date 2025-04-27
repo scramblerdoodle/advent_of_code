@@ -4,7 +4,7 @@ use std::path::Path;
 use std::slice::Iter;
 use std::vec::IntoIter;
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Direction {
     Up,
     Right,
