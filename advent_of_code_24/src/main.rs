@@ -15,7 +15,7 @@ pub mod day14;
 pub mod day15;
 pub mod day15_v2;
 pub mod day16;
-// pub mod day17;
+pub mod day17;
 // pub mod day18;
 // pub mod day19;
 // pub mod day20;
@@ -92,7 +92,7 @@ fn main() {
             14 => run_inputs(day14::main),
             15 => run_inputs(day15::main),
             16 => run_inputs(day16::main),
-            17 => println!("not yet implemented"),
+            17 => run_inputs(day17::main),
             18 => println!("not yet implemented"),
             19 => println!("not yet implemented"),
             20 => println!("not yet implemented"),
