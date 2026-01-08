@@ -1,21 +1,13 @@
-package main
+package pkg
 
 import (
+	"advent_of_code_25/utils"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 )
 
-func ReadFile(fileName string) string {
-	fileContent, err := os.ReadFile(fileName)
-	if err != nil {
-		fmt.Printf("Could not read the content in the file due to %v", err)
-	}
-	return string(fileContent)
-}
-
-func day1(input []string) int {
+func day1_pt1(input []string) int {
 	var pos = 50
 	var count = 0
 
@@ -60,9 +52,9 @@ func day1_pt2(input []string) int {
 			pos -= d
 		}
 
-		curr_pos := pos
+		// curr_pos := pos
 
-		fmt.Println(v)
+		// fmt.Println(v)
 
 		if pos < 0 {
 
@@ -75,18 +67,18 @@ func day1_pt2(input []string) int {
 			pos = pos % 100
 			pos = 100 + pos
 
-			fmt.Println(curr_pos, pos, count)
+			// fmt.Println(curr_pos, pos, count)
 
 		} else if pos > 100 {
-			curr_pos := pos
+			// curr_pos := pos
 
 			count += pos / 100
 			pos = pos % 100
 
-			fmt.Println(curr_pos, pos, count)
+			// fmt.Println(curr_pos, pos, count)
 		} else if pos == 0 {
 			count++
-			fmt.Println(curr_pos, pos, count)
+			// fmt.Println(curr_pos, pos, count)
 		}
 		prev_pos = pos
 
@@ -95,12 +87,11 @@ func day1_pt2(input []string) int {
 	return count
 }
 
-func main() {
-	data := ReadFile("tests/day1.txt")
-	data = strings.Trim(data, "\n")
+func Day01() {
+	data := utils.ReadFile("tests/day1.txt")
 
 	input := strings.Split(data, "\n")
-	ret := day1(input)
+	ret := day1_pt1(input)
 	fmt.Println(ret)
 
 	ret = day1_pt2(input)

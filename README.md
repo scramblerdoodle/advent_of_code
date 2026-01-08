@@ -1,7 +1,7 @@
 # Advent of Code Solutions
 This started as a local git repo just so I could keep track of some experiments while learning Rust, then I started AOC24 and now it's separated into its own AOC solutions repository.
 
-This is mostly a learning experience with Rust.
+This is mostly a learning experience with Rust and Go.
 
 ## Usage
 The folder `advent_of_code_24/` contains all solutions I've made for Adv of Code 24.
@@ -14,3 +14,6 @@ If the input file for a certain day is missing, it'll just be skipped
 - [ ] Improve `AOC24/day07.rs` -- it's got awful performance in Part 2
 - [ ] Improve file structure -- keep `src/utils.rs` in a common folder across all AOC days maybe?
 - [ ] Finish AOC24 (as of today, stopped on Day 16)
+
+## AoC25
+- [X] Better project structure in the Go portion (main function that calls specific days etc)
