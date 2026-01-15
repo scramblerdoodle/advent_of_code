@@ -13,3 +13,9 @@ func ReadFile(fileName string) string {
 	}
 	return strings.Trim(string(fileContent), "\n")
 }
+
+func RunesToInt(r []rune) int {
+	d := 0
+	fmt.Sscanf(string(r), "%d", &d)
+	return d
+}
