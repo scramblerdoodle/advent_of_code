@@ -18,6 +18,9 @@ func main() {
 
 		fmt.Println("\nDay 03")
 		pkg.Day03()
+
+		fmt.Println("\nDay 04")
+		pkg.Day04()
 	}
 
 	for i, day := range days {
@@ -38,6 +41,10 @@ func main() {
 		case "03", "3":
 			fmt.Println("Day 03")
 			pkg.Day03()
+
+		case "04", "4":
+			fmt.Println("Day 04")
+			pkg.Day04()
 
 		default:
 			fmt.Printf("Unknown day %s", day)
