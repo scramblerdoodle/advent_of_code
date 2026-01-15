@@ -78,7 +78,7 @@ func day2_pt2(input string) int {
 }
 
 func Day02() {
-	data := utils.ReadFile("tests/day2.txt")
+	data := utils.ReadFile("tests/day02.txt")
 
 	ret := day2_pt1(data)
 	fmt.Println(ret)

@@ -88,7 +88,7 @@ func day1_pt2(input []string) int {
 }
 
 func Day01() {
-	data := utils.ReadFile("tests/day1.txt")
+	data := utils.ReadFile("tests/day01.txt")
 
 	input := strings.Split(data, "\n")
 	ret := day1_pt1(input)
