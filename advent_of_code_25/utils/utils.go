@@ -30,25 +30,6 @@ func Make2DRuneSlice(input []string) [][]rune {
 	}
 }
 
-type Neighbours[T any] struct {
-	NW, N, NE T
-	W, E      T
-	SW, S, SE T
-}
-
-func NeighboursDefault[T any](defaultValue T) Neighbours[T] {
-	return Neighbours[T]{
-		NW: defaultValue,
-		N:  defaultValue,
-		NE: defaultValue,
-		W:  defaultValue,
-		E:  defaultValue,
-		SW: defaultValue,
-		S:  defaultValue,
-		SE: defaultValue,
-	}
-}
-
 type Board[T any] struct {
 	X, Y  int
 	Board [][]T
@@ -96,12 +77,42 @@ func FillBoard[T any](b *Board[T], data [][]T) {
 	}
 }
 
+func TransposeBoard[T any](b *Board[T]) *Board[T] {
+	newBoard := NewBoard[T](b.Y, b.X, b.Board[0][0])
+	for i := 0; i < b.Y; i++ {
+		for j := 0; j < b.X; j++ {
+			newBoard.Board[j][i] = b.Board[i][j]
+		}
+	}
+
+	return newBoard
+}
+
 func PrintBoard[T rune](b *Board[rune]) {
 	for y := 0; y < b.Y; y++ {
 		for x := 0; x < b.X; x++ {
 			fmt.Print(string(b.Board[y][x]))
 		}
 		fmt.Println()
+	}
+}
+
+type Neighbours[T any] struct {
+	NW, N, NE T
+	W, E      T
+	SW, S, SE T
+}
+
+func NeighboursDefault[T any](defaultValue T) Neighbours[T] {
+	return Neighbours[T]{
+		NW: defaultValue,
+		N:  defaultValue,
+		NE: defaultValue,
+		W:  defaultValue,
+		E:  defaultValue,
+		SW: defaultValue,
+		S:  defaultValue,
+		SE: defaultValue,
 	}
 }
 
