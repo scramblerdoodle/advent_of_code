@@ -84,7 +84,12 @@ func printCell[T Cell](v T) {
 	case rune:
 		fmt.Print(string(v))
 	case int:
-		fmt.Print(v)
+		if v == 0 {
+			fmt.Print(string('.'))
+		} else {
+			fmt.Print(v)
+
+		}
 	case string:
 		fmt.Print(v)
 	}

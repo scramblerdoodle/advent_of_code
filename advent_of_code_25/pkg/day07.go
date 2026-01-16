@@ -19,9 +19,6 @@ func day7_pt1(input []string) int {
 
 			case 'S':
 				grid.Grid[y+1][x] = '|'
-				utils.DebugPrintln("Found S")
-				grid.PrintGrid()
-				utils.DebugPrintln()
 
 			case '^':
 				prev := grid.Grid[y-1][x]
@@ -40,9 +37,6 @@ func day7_pt1(input []string) int {
 					}
 					acc++
 
-					utils.DebugPrintln("Found ^, prev |")
-					grid.PrintGrid()
-					utils.DebugPrintln()
 				}
 
 			case '|':
@@ -55,19 +49,87 @@ func day7_pt1(input []string) int {
 
 				}
 
-				utils.DebugPrintln("Found | at", x, y)
-				grid.PrintGrid()
-				utils.DebugPrintln()
-
 			}
 		}
+		grid.PrintGrid()
+		utils.DebugPrintln()
 	}
 
 	return acc
 }
 
+type Coordinate struct {
+	X, Y int
+}
+
+func FindCoordinate(q *utils.Queue[Coordinate], target Coordinate) (int, bool) {
+
+	for i, v := range q.Items {
+		if v.X == target.X && v.Y == target.Y {
+			return i, true
+		}
+	}
+
+	return -1, false
+}
+
 func day7_pt2(input []string) int {
+	grid := utils.NewGridFromValues(utils.Make2DRuneSlice(input))
+	values_grid := utils.NewGrid(len(input[0]), len(input), 0)
+
 	acc := 0
+
+	q := &utils.Queue[Coordinate]{}
+	q.Enqueue(Coordinate{grid.X / 2, 0}) // Starting point
+	values_grid.Grid[0][grid.X/2]++
+
+	for coord, ok := q.Dequeue(); ok; coord, ok = q.Dequeue() {
+		utils.DebugPrintln("Evaluating coordinate", coord, string(grid.Grid[coord.Y][coord.X]))
+
+		if coord.Y+1 >= grid.Y {
+			acc += values_grid.Grid[coord.Y][coord.X]
+			utils.DebugPrintln("Reached the end, acc", acc)
+			continue
+		}
+		next := &grid.Grid[coord.Y+1][coord.X]
+		current_value := values_grid.Grid[coord.Y][coord.X]
+		next_value := &values_grid.Grid[coord.Y+1][coord.X]
+
+		switch *next {
+		case '.':
+			q.Enqueue(Coordinate{coord.X, coord.Y + 1})
+			*next_value += current_value
+			*next = '|'
+
+		case '^':
+			if coord.X-1 >= 0 {
+				grid.Grid[coord.Y+1][coord.X-1] = '|'
+				values_grid.Grid[coord.Y+1][coord.X-1] += current_value
+
+				_, exists := FindCoordinate(q, Coordinate{coord.X - 1, coord.Y + 1})
+				if !exists {
+					q.Enqueue(Coordinate{coord.X - 1, coord.Y + 1})
+				}
+			}
+			if coord.X+1 < grid.X {
+				grid.Grid[coord.Y+1][coord.X+1] = '|'
+				values_grid.Grid[coord.Y+1][coord.X+1] += current_value
+
+				_, exists := FindCoordinate(q, Coordinate{coord.X + 1, coord.Y + 1})
+				if !exists {
+					q.Enqueue(Coordinate{coord.X + 1, coord.Y + 1})
+				}
+			}
+		case '|':
+			*next_value += current_value
+		}
+
+		grid.PrintGrid()
+		utils.DebugPrintln()
+
+	}
+
+	values_grid.PrintGrid()
 	return acc
 }
 
