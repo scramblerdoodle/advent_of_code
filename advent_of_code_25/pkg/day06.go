@@ -18,14 +18,14 @@ func day6_pt1(input []string) int {
 
 	acc := 0
 	for _, l := range b.Board {
-		// fmt.Println(l)
+		utils.DebugPrintln(l)
 
 		numbers := []int{}
 		for _, numstr := range l[:len(l)-1] {
 			num, _ := strconv.Atoi(numstr)
 			numbers = append(numbers, num)
 		}
-		// fmt.Println(numbers)
+		utils.DebugPrintln(numbers)
 
 		operation := l[len(l)-1]
 		if operation == "+" {
@@ -33,7 +33,8 @@ func day6_pt1(input []string) int {
 			for _, n := range numbers {
 				result += n
 			}
-			// fmt.Println("result:", result)
+			utils.DebugPrintln("result:", result)
+
 			acc += result
 		}
 
@@ -42,7 +43,7 @@ func day6_pt1(input []string) int {
 			for _, n := range numbers {
 				result *= n
 			}
-			// fmt.Println("result:", result)
+			utils.DebugPrintln("result:", result)
 			acc += result
 		}
 	}

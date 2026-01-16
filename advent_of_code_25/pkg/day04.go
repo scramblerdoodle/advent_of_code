@@ -10,7 +10,7 @@ func day4_pt1(input []string) int {
 	board := utils.NewBoardFromValues(utils.Make2DRuneSlice(input))
 	acc := 0
 
-	// utils.PrintBoard(board)
+	utils.PrintBoard(board)
 
 	for y := 0; y < board.Y; y++ {
 		for x := 0; x < board.X; x++ {
@@ -18,7 +18,7 @@ func day4_pt1(input []string) int {
 
 			if current == '@' {
 				neighbours := utils.CheckNeighbours(board, x, y, rune('!'))
-				// utils.PrintNeighbours(neighbours)
+				utils.PrintNeighbours(neighbours)
 				neighbours_slice := utils.NeighboursToSlice(neighbours)
 
 				tp_rolls := 0
@@ -43,7 +43,7 @@ func day4_pt2(input []string) int {
 	acc := 0
 	to_remove := 0
 
-	// utils.PrintBoard(board)
+	utils.PrintBoard(board)
 
 	for ok := true; ok; ok = to_remove > 0 {
 		to_remove = 0
@@ -53,7 +53,7 @@ func day4_pt2(input []string) int {
 
 				if current == '@' {
 					neighbours := utils.CheckNeighbours(board, x, y, rune('!'))
-					// utils.PrintNeighbours(neighbours)
+					utils.PrintNeighbours(neighbours)
 					neighbours_slice := utils.NeighboursToSlice(neighbours)
 
 					tp_rolls := 0

@@ -21,6 +21,7 @@ func day2_pt1(input string) int {
 	//
 	// idea: split digits in half, compare first half and second half. if equal, then it's invalid, add to sum
 	count := 0
+	// TODO: look up SplitSeq
 	ranges := strings.Split(input, ",")
 	for _, r := range ranges {
 		limits := strings.Split(r, "-")
@@ -40,7 +41,7 @@ func day2_pt1(input string) int {
 
 			n := len(v) / 2
 			if v[:n] == v[n:] {
-				// fmt.Println(v, v[:n], v[n:])
+				utils.DebugPrintln(v, v[:n], v[n:])
 				count += d
 			}
 
@@ -67,7 +68,7 @@ func day2_pt2(input string) int {
 
 			n := len(v) / 2
 			if v[:n] == v[n:] {
-				// fmt.Println(v, v[:n], v[n:])
+				utils.DebugPrintln(v, v[:n], v[n:])
 				count += d
 			}
 
