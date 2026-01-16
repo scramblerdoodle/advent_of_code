@@ -7,19 +7,19 @@ import (
 )
 
 func day4_pt1(input []string) int {
-	board := utils.NewBoardFromValues(utils.Make2DRuneSlice(input))
+	grid := utils.NewGridFromValues(utils.Make2DRuneSlice(input))
 	acc := 0
 
-	utils.PrintBoard(board)
+	grid.PrintGrid()
 
-	for y := 0; y < board.Y; y++ {
-		for x := 0; x < board.X; x++ {
-			current := board.Board[y][x]
+	for y := 0; y < grid.Y; y++ {
+		for x := 0; x < grid.X; x++ {
+			current := grid.Grid[y][x]
 
 			if current == '@' {
-				neighbours := utils.CheckNeighbours(board, x, y, rune('!'))
+				neighbours := grid.CheckNeighbours(x, y, rune('!'))
 				utils.PrintNeighbours(neighbours)
-				neighbours_slice := utils.NeighboursToSlice(neighbours)
+				neighbours_slice := neighbours.NeighboursToSlice()
 
 				tp_rolls := 0
 				for _, n := range neighbours_slice {
@@ -39,22 +39,22 @@ func day4_pt1(input []string) int {
 }
 
 func day4_pt2(input []string) int {
-	board := utils.NewBoardFromValues(utils.Make2DRuneSlice(input))
+	grid := utils.NewGridFromValues(utils.Make2DRuneSlice(input))
 	acc := 0
 	to_remove := 0
 
-	utils.PrintBoard(board)
+	grid.PrintGrid()
 
 	for ok := true; ok; ok = to_remove > 0 {
 		to_remove = 0
-		for y := 0; y < board.Y; y++ {
-			for x := 0; x < board.X; x++ {
-				current := board.Board[y][x]
+		for y := 0; y < grid.Y; y++ {
+			for x := 0; x < grid.X; x++ {
+				current := grid.Grid[y][x]
 
 				if current == '@' {
-					neighbours := utils.CheckNeighbours(board, x, y, rune('!'))
+					neighbours := grid.CheckNeighbours(x, y, rune('!'))
 					utils.PrintNeighbours(neighbours)
-					neighbours_slice := utils.NeighboursToSlice(neighbours)
+					neighbours_slice := neighbours.NeighboursToSlice()
 
 					tp_rolls := 0
 					for _, n := range neighbours_slice {
@@ -65,7 +65,7 @@ func day4_pt2(input []string) int {
 
 					if tp_rolls < 4 {
 						to_remove++
-						board.Board[y][x] = '.'
+						grid.Grid[y][x] = '.'
 					}
 				}
 			}

@@ -13,11 +13,11 @@ func day6_pt1(input []string) int {
 		formatted_input = append(formatted_input, strings.Fields(line))
 	}
 
-	board := utils.NewBoardFromValues(formatted_input)
-	b := utils.TransposeBoard(board)
+	grid := utils.NewGridFromValues(formatted_input)
+	g := grid.TransposeGrid()
 
 	acc := 0
-	for _, l := range b.Board {
+	for _, l := range g.Grid {
 		utils.DebugPrintln(l)
 
 		numbers := []int{}

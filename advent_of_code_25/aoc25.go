@@ -72,7 +72,7 @@ func main() {
 			pkg.Day07()
 
 		default:
-			fmt.Printf("Unknown day %s", day)
+			fmt.Println("Unknown day", day)
 		}
 	}
 }
