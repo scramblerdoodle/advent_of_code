@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+var Debug bool
+
+func DebugPrintln(a ...any) {
+	if Debug {
+		fmt.Println(a...)
+	}
+}
+
 func ReadFile(fileName string) string {
 	fileContent, err := os.ReadFile(fileName)
 	if err != nil {
@@ -89,11 +97,13 @@ func TransposeBoard[T any](b *Board[T]) *Board[T] {
 }
 
 func PrintBoard[T rune](b *Board[rune]) {
-	for y := 0; y < b.Y; y++ {
-		for x := 0; x < b.X; x++ {
-			fmt.Print(string(b.Board[y][x]))
+	if Debug {
+		for y := 0; y < b.Y; y++ {
+			for x := 0; x < b.X; x++ {
+				fmt.Print(string(b.Board[y][x]))
+			}
+			fmt.Println()
 		}
-		fmt.Println()
 	}
 }
 
@@ -172,18 +182,20 @@ func NeighboursToSlice[T any](n Neighbours[T]) []T {
 }
 
 func PrintNeighbours[T rune](n Neighbours[rune]) {
-	fmt.Println("----")
-	fmt.Print(string(n.NW))
-	fmt.Print(string(n.N))
-	fmt.Print(string(n.NE))
-	fmt.Println()
-	fmt.Print(string(n.W))
-	fmt.Print(".")
-	fmt.Print(string(n.E))
-	fmt.Println()
-	fmt.Print(string(n.SW))
-	fmt.Print(string(n.S))
-	fmt.Print(string(n.SE))
-	fmt.Println()
-	fmt.Println("----")
+	if Debug {
+		fmt.Println("----")
+		fmt.Print(string(n.NW))
+		fmt.Print(string(n.N))
+		fmt.Print(string(n.NE))
+		fmt.Println()
+		fmt.Print(string(n.W))
+		fmt.Print(".")
+		fmt.Print(string(n.E))
+		fmt.Println()
+		fmt.Print(string(n.SW))
+		fmt.Print(string(n.S))
+		fmt.Print(string(n.SE))
+		fmt.Println()
+		fmt.Println("----")
+	}
 }

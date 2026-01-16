@@ -2,12 +2,16 @@ package main
 
 import (
 	"advent_of_code_25/pkg"
+	"advent_of_code_25/utils"
+	"flag"
 	"fmt"
-	"os"
 )
 
 func main() {
-	days := os.Args[1:]
+	flag.BoolVar(&utils.Debug, "d", false, "enable debug output")
+	flag.Parse()
+
+	days := flag.Args()
 
 	if len(days) == 0 {
 		fmt.Println("Day 01")
@@ -27,6 +31,9 @@ func main() {
 
 		fmt.Println("\nDay 06")
 		pkg.Day06()
+
+		fmt.Println("\nDay 07")
+		pkg.Day07()
 	}
 
 	for i, day := range days {
@@ -59,6 +66,10 @@ func main() {
 		case "06", "6":
 			fmt.Println("Day 06")
 			pkg.Day06()
+
+		case "07", "7":
+			fmt.Println("Day 07")
+			pkg.Day07()
 
 		default:
 			fmt.Printf("Unknown day %s", day)
