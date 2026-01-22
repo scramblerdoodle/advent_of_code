@@ -28,6 +28,15 @@ func RunesToInt(r []rune) int {
 	return d
 }
 
+func Contains[T comparable](slice []T, value T) int {
+	for i, v := range slice {
+		if v == value {
+			return i
+		}
+	}
+	return -1
+}
+
 func Make2DRuneSlice(input []string) [][]rune {
 	{
 		result := make([][]rune, len(input))
@@ -36,4 +45,13 @@ func Make2DRuneSlice(input []string) [][]rune {
 		}
 		return result
 	}
+}
+
+type Coordinate3D struct {
+	X, Y, Z int
+}
+
+func Pop[T any](slice []T, i int) (T, []T) {
+	value := slice[i]
+	return value, append(slice[:i], slice[i+1:]...)
 }
