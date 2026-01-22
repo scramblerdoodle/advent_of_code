@@ -47,6 +47,10 @@ func Make2DRuneSlice(input []string) [][]rune {
 	}
 }
 
+type Coordinate struct {
+	X, Y int
+}
+
 type Coordinate3D struct {
 	X, Y, Z int
 }

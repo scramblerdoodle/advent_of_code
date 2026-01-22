@@ -28,3 +28,13 @@ func (q *Queue[T]) Find(target T) (int, bool) {
 
 	return -1, false
 }
+
+func FindCoordinate(q *Queue[Coordinate], target Coordinate) (int, bool) {
+	for i, v := range q.Items {
+		if v.X == target.X && v.Y == target.Y {
+			return i, true
+		}
+	}
+
+	return -1, false
+}

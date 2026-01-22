@@ -58,29 +58,14 @@ func day7_pt1(input []string) int {
 	return acc
 }
 
-type Coordinate struct {
-	X, Y int
-}
-
-func FindCoordinate(q *utils.Queue[Coordinate], target Coordinate) (int, bool) {
-
-	for i, v := range q.Items {
-		if v.X == target.X && v.Y == target.Y {
-			return i, true
-		}
-	}
-
-	return -1, false
-}
-
 func day7_pt2(input []string) int {
 	grid := utils.NewGridFromValues(utils.Make2DRuneSlice(input))
 	values_grid := utils.NewGrid(len(input[0]), len(input), 0)
 
 	acc := 0
 
-	q := &utils.Queue[Coordinate]{}
-	q.Enqueue(Coordinate{grid.X / 2, 0}) // Starting point
+	q := &utils.Queue[utils.Coordinate]{}
+	q.Enqueue(utils.Coordinate{X: grid.X / 2, Y: 0}) // Starting point
 	values_grid.Grid[0][grid.X/2]++
 
 	for coord, ok := q.Dequeue(); ok; coord, ok = q.Dequeue() {
@@ -97,7 +82,7 @@ func day7_pt2(input []string) int {
 
 		switch *next {
 		case '.':
-			q.Enqueue(Coordinate{coord.X, coord.Y + 1})
+			q.Enqueue(utils.Coordinate{X: coord.X, Y: coord.Y + 1})
 			*next_value += current_value
 			*next = '|'
 
@@ -106,18 +91,18 @@ func day7_pt2(input []string) int {
 				grid.Grid[coord.Y+1][coord.X-1] = '|'
 				values_grid.Grid[coord.Y+1][coord.X-1] += current_value
 
-				_, exists := FindCoordinate(q, Coordinate{coord.X - 1, coord.Y + 1})
+				_, exists := utils.FindCoordinate(q, utils.Coordinate{X: coord.X - 1, Y: coord.Y + 1})
 				if !exists {
-					q.Enqueue(Coordinate{coord.X - 1, coord.Y + 1})
+					q.Enqueue(utils.Coordinate{X: coord.X - 1, Y: coord.Y + 1})
 				}
 			}
 			if coord.X+1 < grid.X {
 				grid.Grid[coord.Y+1][coord.X+1] = '|'
 				values_grid.Grid[coord.Y+1][coord.X+1] += current_value
 
-				_, exists := FindCoordinate(q, Coordinate{coord.X + 1, coord.Y + 1})
+				_, exists := utils.FindCoordinate(q, utils.Coordinate{X: coord.X + 1, Y: coord.Y + 1})
 				if !exists {
-					q.Enqueue(Coordinate{coord.X + 1, coord.Y + 1})
+					q.Enqueue(utils.Coordinate{X: coord.X + 1, Y: coord.Y + 1})
 				}
 			}
 		case '|':
