@@ -5,7 +5,7 @@ import (
 )
 
 type Cell interface {
-	~rune | ~int | ~string
+	~rune | ~int | ~string | ~bool
 }
 
 type Grid[T Cell] struct {
@@ -83,6 +83,7 @@ func printCell[T Cell](v T) {
 	switch v := any(v).(type) {
 	case rune:
 		fmt.Print(string(v))
+
 	case int:
 		if v == 0 {
 			fmt.Print(string('.'))
@@ -90,7 +91,16 @@ func printCell[T Cell](v T) {
 			fmt.Print(v)
 
 		}
+
 	case string:
 		fmt.Print(v)
+
+	case bool:
+		if v {
+			fmt.Print("X")
+		} else {
+			fmt.Print(".")
+		}
+
 	}
 }
