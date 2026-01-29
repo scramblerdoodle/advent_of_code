@@ -17,7 +17,7 @@ func day4_pt1(input []string) int {
 			current := grid.Grid[y][x]
 
 			if current == '@' {
-				neighbours := grid.CheckNeighbours(x, y, rune('!'))
+				neighbours := grid.GetNeighbours(x, y, rune('!'))
 				utils.PrintNeighbours(neighbours)
 				neighbours_slice := neighbours.NeighboursToSlice()
 
@@ -52,7 +52,7 @@ func day4_pt2(input []string) int {
 				current := grid.Grid[y][x]
 
 				if current == '@' {
-					neighbours := grid.CheckNeighbours(x, y, rune('!'))
+					neighbours := grid.GetNeighbours(x, y, rune('!'))
 					utils.PrintNeighbours(neighbours)
 					neighbours_slice := neighbours.NeighboursToSlice()
 

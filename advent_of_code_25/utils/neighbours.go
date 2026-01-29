@@ -23,7 +23,7 @@ func NeighboursDefault[T any](defaultValue T) Neighbours[T] {
 	}
 }
 
-func (g *Grid[T]) CheckNeighbours(x, y int, defaultValue T) Neighbours[T] {
+func (g *Grid[T]) GetNeighbours(x, y int, defaultValue T) Neighbours[T] {
 	nw, n, ne := defaultValue, defaultValue, defaultValue
 	w, e := defaultValue, defaultValue
 	sw, s, se := defaultValue, defaultValue, defaultValue
