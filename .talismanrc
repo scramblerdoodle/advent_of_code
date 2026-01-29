@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: advent_of_code_25/go.sum
+  checksum: c9929734732b6eeead10e5bb9efeab4eb4c6c23582a58513c4b202e986d83176
+version: "1.0"
