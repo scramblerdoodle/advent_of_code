@@ -4,6 +4,13 @@ type Queue[T comparable] struct {
 	Items []T
 }
 
+func (q Queue[T]) IsEmpty() bool {
+	if len(q.Items) != 0 {
+		return false
+	}
+	return true
+}
+
 func (q *Queue[T]) Enqueue(item T) {
 	q.Items = append(q.Items, item)
 }
