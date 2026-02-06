@@ -28,6 +28,10 @@ func RunesToInt(r []rune) int {
 	return d
 }
 
+func IsNatural(val float64) bool {
+	return val == float64(int(val)) && val >= 0
+}
+
 func Contains[T comparable](slice []T, value T) int {
 	for i, v := range slice {
 		if v == value {

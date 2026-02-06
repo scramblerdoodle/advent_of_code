@@ -2,12 +2,18 @@ package pkg
 
 import (
 	"advent_of_code_25/utils"
+	"errors"
 	"fmt"
-	"github.com/mxschmitt/golang-combinations"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
+
+	"codeberg.org/Gusted/algorithms-go/math/row-reduction"
+	"github.com/mxschmitt/golang-combinations"
 )
+
+const MAX = 1000
 
 type indicatorLights []bool
 
@@ -43,7 +49,114 @@ func (l *indicatorLights) changeLights(button []int) {
 	}
 }
 
-func convert_input(input string) (indicatorLights, [][]int, []int) {
+type joltages []int
+
+func initJoltage(s int) joltages {
+	// Initializes new joltage with default value `0`
+	new_joltage := []int{}
+	for range s {
+		new_joltage = append(new_joltage, 0)
+	}
+	return new_joltage
+}
+
+func (js joltages) getMinJoltage() int {
+	min_joltage := MAX
+	min_joltage_index := -1
+	for i, j := range js {
+		if j < min_joltage && j != 0 {
+			min_joltage = j
+			min_joltage_index = i
+		}
+	}
+	return min_joltage_index
+}
+
+func (js joltages) getZeroedJoltages() []int {
+	zeroed := []int{}
+
+	for i, j := range js {
+		if j == 0 {
+			zeroed = append(zeroed, i)
+		}
+	}
+	return zeroed
+}
+
+type buttons [][]int
+
+func isValidBaseForJoltage(bs buttons, n int) bool {
+	base := []bool{}
+	for range n {
+		base = append(base, false)
+	}
+
+	for _, b := range bs {
+		for _, i := range b {
+			base[i] = true
+		}
+	}
+
+	for _, elem := range base {
+		if !elem {
+			return false
+		}
+	}
+	return true
+}
+
+func removeButtons(bs buttons, to_remove []int) buttons {
+	new_buttons := [][]int{}
+ButtonLoop:
+	for _, b := range bs {
+		for _, b_i := range to_remove {
+			if slices.Contains(b, b_i) {
+				continue ButtonLoop
+			}
+		}
+		new_buttons = append(new_buttons, b)
+	}
+	return new_buttons
+}
+
+func popLongestSequenceForJoltageIndex(bs *[][]int, n int) ([]int, error) {
+	max_length := 0
+	max_index := -1
+	max_button_seq := []int{}
+	for i, b := range *bs {
+		if len(b) > max_length && slices.Contains(b, n) {
+			max_length = len(b)
+			max_index = i
+			max_button_seq = b
+		}
+	}
+
+	if max_index == -1 {
+		err_msg := fmt.Sprintf("Target joltage %d not found in buttons %v", n, *bs)
+		return []int{}, errors.New(err_msg)
+	}
+
+	*bs = append((*bs)[:max_index], (*bs)[max_index+1:]...)
+
+	return max_button_seq, nil
+}
+
+func (js *joltages) updateJoltage(button_seq []int, n int) {
+	for _, i := range button_seq {
+		(*js)[i] += n
+	}
+}
+
+func (js1 joltages) compareJoltages(js2 joltages) bool {
+	for i := range js1 {
+		if js1[i] != js2[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func convert_input(input string) (indicatorLights, buttons, joltages) {
 	// Match []
 	indicator := []bool{}
 	re_indicator := regexp.MustCompile(`\[.+\]`)
@@ -57,8 +170,6 @@ func convert_input(input string) (indicatorLights, [][]int, []int) {
 			indicator = append(indicator, true)
 		}
 	}
-	// Example result:
-	// [.##.] => [false, true, true, false]
 
 	// All matches ()
 	buttons := [][]int{}
@@ -73,8 +184,6 @@ func convert_input(input string) (indicatorLights, [][]int, []int) {
 		}
 		buttons = append(buttons, buttons_tmp)
 	}
-	// Example result:
-	// (3) (1,3) (2) (2,3) (0,2) (0,1) => [[3], [1,3], [2], [2,3], [0,2], [0,1]]
 
 	// Match {}
 	joltage := []int{}
@@ -85,8 +194,6 @@ func convert_input(input string) (indicatorLights, [][]int, []int) {
 		j_i, _ := strconv.Atoi(j)
 		joltage = append(joltage, j_i)
 	}
-	// Example result:
-	// {3,5,4,7} => [3,5,4,7]
 
 	return indicator, buttons, joltage
 }
@@ -95,15 +202,15 @@ func day10_pt1(input []string) int {
 	acc := 0
 	for _, l := range input {
 		// Convert line into expected structure
-		target_indicator, buttons, joltage := convert_input(l)
-		utils.DebugPrintln(target_indicator, buttons, joltage)
+		target_indicator, existing_buttons, _ := convert_input(l)
+		utils.DebugPrintln(target_indicator, existing_buttons)
 
 		// Get all possible combinations
 		// TODO: may be overkill, could start with lowest combinations.Combinations(k), k:=1..n
 		// 			 if any of the lowest ones match already, break the loop
-		buttons_combos := combinations.All(buttons)
+		buttons_combos := combinations.All(existing_buttons)
 
-		min_button_presses := 100 // Magic number, but none of the sequences have more than 100 buttons so it's safe to set as MAX
+		min_button_presses := MAX
 		for _, b_c := range buttons_combos {
 
 			// Skip if combination is longer than existing min already
@@ -137,10 +244,158 @@ func day10_pt1(input []string) int {
 	return acc
 }
 
-func day10_pt2(input []string) int {
-	acc := 0
+func convertButtonsToLinearSystem(button_combo [][]int, size int) *utils.Grid[int] {
+	// Convert button combo into a matrix for the linear system
+	A := [][]int{}
+	for _, b := range button_combo {
+		// Init vec as len(target_joltage) all zeroes
+		vec := []int{}
+		for range size {
+			vec = append(vec, 0)
+		}
+		for _, i := range b {
+			vec[i] = 1
+		}
+		A = append(A, vec)
+	}
 
-	return acc
+	grid_A := utils.NewGridFromValues(A)
+
+	// Transpose A
+	A_t := grid_A.TransposeGrid()
+
+	return A_t
+}
+
+func solveLinearSystem(linear_system utils.Grid[int], target_joltage joltages) (res [][]int, err error) {
+	// Convert to linear equations
+	equations := make([][]float64, len(target_joltage))
+	for i, vec := range linear_system.Grid {
+		eq := make([]float64, len(vec)+1)
+		for j, v := range vec {
+			eq[j] = float64(v)
+		}
+
+		eq[len(eq)-1] = float64(target_joltage[i])
+		equations[i] = eq
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			// Convert the panic value to an error
+			switch v := r.(type) {
+			case error:
+				err = v
+			default:
+				err = fmt.Errorf("gaussian solver panicked: %v", v)
+			}
+		}
+	}()
+	utils.DebugPrintln("Attempting to solve for equations", equations)
+	// WARNING: This is a Diophantine Equation, Gaussian Elimination will not necessarily work here
+	// TODO: Implement a Diophantine equation solver
+	res_f64 := rowreduction.GaussianElimination(equations)
+	_, err = solutionSanityCheck(res_f64)
+	if err != nil {
+		return [][]int{}, err
+	}
+
+	result := make([][]int, len(target_joltage))
+	for i, vec := range res_f64 {
+		eq := make([]int, len(vec))
+		for j, v := range vec {
+			eq[j] = int(v)
+		}
+
+		result[i] = eq
+	}
+
+	return result, nil
+}
+
+func solutionSanityCheck(res [][]float64) (bool, error) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+	for _, r := range res {
+		for _, v := range r {
+			if !utils.IsNatural(v) {
+				return false, errors.New("Non-natural solution")
+			}
+		}
+	}
+
+	return true, nil
+}
+
+func backSubstitution(mat [][]int) (res []int, err error) {
+	N := len(mat)
+	res = make([]int, len(mat))
+	for i := N - 1; i >= 0; i-- {
+		res[i] = mat[i][N]
+
+		for j := i + 1; j < N; j++ {
+			res[i] -= mat[i][j] * res[j]
+		}
+		// res[i] = res[i] / mat[i][i]
+		if res[i] < 0 {
+			return []int{}, errors.New("Non-positive solution")
+		}
+	}
+	return res, nil
+
+}
+
+func day10_pt2(input []string) (int, error) {
+	acc := 0
+	for _, l := range input {
+		// Convert line into expected structure
+		_, existing_buttons, target_joltage := convert_input(l)
+		utils.DebugPrintln(existing_buttons, target_joltage)
+
+		buttons_combos := combinations.All(existing_buttons)
+
+		min_button_presses := MAX
+
+		for _, b_c := range buttons_combos {
+			utils.DebugPrintln("Checking combo", b_c)
+			linear_system := convertButtonsToLinearSystem(b_c, len(target_joltage))
+			mat, err := solveLinearSystem(*linear_system, target_joltage)
+			if err != nil {
+				utils.DebugPrintln("Failed to reduce linear system w/ Gaussian Elimination, error:", err)
+				continue
+			}
+
+			res, err := backSubstitution(mat)
+			if err != nil {
+				utils.DebugPrintln("Failed to solve linear system w/ back substitution, error:", err)
+				continue
+			}
+
+			utils.DebugPrintln("Result:", res)
+
+			button_presses := 0
+			for _, v := range res {
+				button_presses += v
+			}
+
+			if min_button_presses > button_presses && button_presses != 0 {
+				min_button_presses = button_presses
+				utils.DebugPrintln("New min found:", min_button_presses)
+
+			}
+
+		}
+
+		if min_button_presses == MAX {
+			utils.DebugPrintln("No solution found for", existing_buttons, target_joltage)
+			return 0, errors.New("No solution found for one of the inputs")
+		}
+		acc += min_button_presses
+	}
+
+	return acc, nil
 }
 
 func Day10() {
@@ -150,6 +405,12 @@ func Day10() {
 	ret := day10_pt1(input)
 	fmt.Println(ret)
 
-	ret = day10_pt2(input)
-	fmt.Println(ret)
+	ret, err := day10_pt2(input)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(ret)
+	}
+	// Ret: 138277, too high
+
 }
