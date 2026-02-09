@@ -3,53 +3,83 @@ package pkg
 import (
 	"advent_of_code_25/utils"
 	"fmt"
-	// "strconv"
+	"maps"
 	"strings"
 )
 
 func day11_pt1(input []string) int {
 	graph := make(map[string][]string)
-	// WARNING: Assuming it's a DAG, don't need to keep track of visited nodes
-	// visited := make(map[string]bool)
 	for _, l := range input {
 		nodes := strings.Split(l, " ")
 		source := nodes[0][:len(nodes[0])-1] // Removing ":" from source node
 		targets := nodes[1:]
 
 		graph[source] = targets
-		// visited[source] = false
 	}
 
 	q := utils.Queue[string]{Items: graph["you"]}
-	utils.DebugPrintln(q)
 
 	acc := 0
+	// BFS
+	// WARNING: if there are ANY loops in the graph, this will go into an infinite loop
+	// so we're assuming that the source graph is a DAG
 	for node, ok := q.Dequeue(); ok; node, ok = q.Dequeue() {
-		utils.DebugPrintln("Visiting node", node)
+		// utils.DebugPrintln("Visiting node", node)
 		// If out node, add to acc and continue
 		if node == "out" {
 			acc++
 			continue
 		}
 
-		// Skip already visited node, avoid cycles
-		// if visited[node] {
-		// 	continue
-		// }
-		// visited[node] = true
-
 		for _, n := range graph[node] {
 			q.Enqueue(n)
 		}
-		utils.DebugPrintln("Queue", q)
 	}
 
 	return acc
 }
 
-func day11_pt2(input []string) int {
-	acc := 0
+func countPathsFromTarget(graph map[string][]string, target string) (ret map[string]int) {
+	counts := make(map[string]int)
+	new_counts := make(map[string]int)
 
+	for node := range graph {
+		new_counts[node] = 0
+	}
+	new_counts[target] = 1
+
+	for !maps.Equal(counts, new_counts) {
+		maps.Copy(counts, new_counts)
+
+		for node := range counts {
+			if node == target {
+				new_counts[node] = 1
+			} else {
+				sum := 0
+				for _, child := range graph[node] {
+					sum += counts[child]
+				}
+				new_counts[node] = sum
+			}
+		}
+	}
+
+	return new_counts
+}
+
+func day11_pt2(input []string) int {
+	graph := make(map[string][]string)
+	visited := map[string]bool{}
+	for _, l := range input {
+		nodes := strings.Split(l, " ")
+		source := nodes[0][:len(nodes[0])-1] // Removing ":" from source node
+		targets := nodes[1:]
+
+		graph[source] = targets
+		visited[source] = false
+	}
+	acc := countPathsFromTarget(graph, "fft")["svr"] * countPathsFromTarget(graph, "dac")["fft"] * countPathsFromTarget(graph, "out")["dac"]
+	acc += countPathsFromTarget(graph, "dac")["svr"] * countPathsFromTarget(graph, "fft")["dac"] * countPathsFromTarget(graph, "out")["fft"]
 	return acc
 }
 

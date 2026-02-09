@@ -26,6 +26,18 @@ func (q *Queue[T]) Dequeue() (T, bool) {
 	return item, true
 }
 
+func (q *Queue[T]) Pop() (T, bool) {
+	if len(q.Items) == 0 {
+		var zero T
+		return zero, false
+	}
+
+	N := len(q.Items)
+	item, remaining := q.Items[N-1], q.Items[:N-1]
+	q.Items = remaining
+	return item, true
+}
+
 func (q *Queue[T]) Find(target T) (int, bool) {
 	for i, v := range q.Items {
 		if v == target {
