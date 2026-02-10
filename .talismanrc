@@ -2,3 +2,9 @@ fileignoreconfig:
 - filename: advent_of_code_25/go.sum
   checksum: 0660e13814089c9c1e777e8360321f1bfb5aaab02a01433a877d1567b294e2dd
 version: "1.0"
+
+fileignoreconfig:
+- filename: README.md
+  checksum: 82518513d82ce345b945aa4da49c5c7dbeab988d020e2cf40b428db9f72acbce
+version: "1.0"
+

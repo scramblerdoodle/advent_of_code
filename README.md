@@ -12,7 +12,7 @@ If the input file for a certain day is missing, it'll just be skipped
 
 ## Usage AoC25
 The folder `advent_of_code_25/` contains all solutions for Advent of Code 25, written in Go.
-To run the code, just run `go run aoc25.go` in the `advent_of_code_25/` folder. You can also choose a specific day among the ones that have been implemented so far, e.g. `go run aoc25.go 3` to only run Day 3.
+To run the code, just run `go run aoc25.go` in the `advent_of_code_25/` folder. You can also choose a specific day among the ones that have been implemented so far, e.g. `go run aoc25.go 3` to only run Day 3. You can also pass the flag `-d` for the debug print, e.g. `go run aoc25.go -d 7`
 All test files are under `tests/` with the appropriate days' number (e.g. `tests/day03.txt` for Day 3). Add your own input to your heart's content!
 
 
@@ -23,6 +23,9 @@ All test files are under `tests/` with the appropriate days' number (e.g. `tests
 
 ## Checklist AoC25
 - [X] Better project structure in the Go portion (main function that calls specific days etc)
-- [ ] Finish part 2 for Day 1
-- [ ] Finish part 2 for Day 2
-- [ ] Finish AoC25 (stopped on Day 5)
+- [ ] Finish part 2 for Day 1 (such a simple problem, no idea what edge case I'm missing)
+- [ ] Finish part 2 for Day 9 (taking forever, there's definitely some obvious math optimisation that gets me to figure out if it's inside/outside the allowed area)
+- [ ] Finish part 2 for Day 10 (just need to write a diophantine equation solver)
+- [ ] Finish Day 12 (got freaked out just from reading it, it looks NP-hard)
+- [ ] Write test suite for everything using default input
+- [ ] Explore go routines
